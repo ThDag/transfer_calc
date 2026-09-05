@@ -11,7 +11,7 @@
     },
     "typographyMeta": {
       "label": { "displayName": "Label", "purpose": "Field name and row captions, uppercase, tracked." },
-      "numeric": { "displayName": "Numeric", "purpose": "Every amount input and computed monetary value, tabular numerals. The rate fields (Service Rate %, Our Rate %) use the same role at a smaller 18px size." }
+      "numeric": { "displayName": "Numeric", "purpose": "Every amount input and computed monetary value, tabular numerals. The rate fields (Service Rate %, Our Rate %) use the same role at a smaller 18px size; Twin Pair Field segments at 22px." }
     },
     "shadows": [],
     "motion": [],
@@ -19,20 +19,12 @@
   },
   "components": [
     {
-      "name": "Card",
-      "kind": "card",
-      "refersTo": "card",
-      "description": "The bordered black console holding the whole calculator.",
-      "html": "<div class=\"ds-card\">Card content</div>",
-      "css": ".ds-card { background: #000000; color: #ffffff; border: 3px solid #ffffff; border-radius: 0; padding: 24px; }"
-    },
-    {
-      "name": "Input Field",
+      "name": "Twin Pair Field",
       "kind": "input",
       "refersTo": "input-field",
-      "description": "USD / AED / Received Amount fields — large tabular numerals, hard white border, all three fully bidirectionally linked, comma-grouped as you type.",
-      "html": "<input class=\"ds-input\" type=\"text\" inputmode=\"decimal\" placeholder=\"0.00\">",
-      "css": ".ds-input { width: 100%; font-size: 28px; font-weight: 800; padding: 12px 14px; border-radius: 0; border: 2px solid #ffffff; background: #000000; color: #ffffff; outline: none; caret-color: #87a96b; } .ds-input::placeholder { color: #999999; } .ds-input:focus { border-color: #87a96b; outline: 2px solid #87a96b; outline-offset: 2px; }"
+      "description": "Amount and Received Amount: one shared 2px Signal White border wraps a USD segment stacked ABOVE an AED segment, split by a 2px internal horizontal rule — one border, one label above the whole group ('Amount' / 'Received Amount'), never one label per segment. Each segment spans the box's full width (not half, side by side) and carries its own borderless mini copy icon inline, scoped to that segment's own value only. 22px numerals — close to a real primary input's weight, since stacking gives each face the full width instead of splitting it. No per-segment border to turn on focus, so the focused segment gets an inset Sage outline instead. Editing either segment recomputes the other and the whole breakdown.",
+      "html": "<div class=\"ds-pair\"><div class=\"ds-pair-field\"><span class=\"ds-pair-prefix\">$</span><input type=\"text\" inputmode=\"decimal\" placeholder=\"0.00\"><button type=\"button\" class=\"ds-pair-copy\" aria-label=\"Copy USD amount\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\"></rect><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"></path></svg></button></div><div class=\"ds-pair-field\"><span class=\"ds-pair-prefix\">AED</span><input type=\"text\" inputmode=\"decimal\" placeholder=\"0.00\"><button type=\"button\" class=\"ds-pair-copy\" aria-label=\"Copy AED amount\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\"></rect><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"></path></svg></button></div></div>",
+      "css": ".ds-pair { display: flex; flex-direction: column; border: 2px solid #ffffff; border-radius: 0; background: #000000; } .ds-pair-field { position: relative; display: flex; align-items: center; } .ds-pair-field + .ds-pair-field { border-top: 2px solid #ffffff; } .ds-pair-prefix { position: absolute; left: 14px; font-size: 14px; font-weight: 800; color: #999999; } .ds-pair-field input { flex: 1; min-width: 0; border: none; background: transparent; font-size: 22px; font-weight: 800; padding: 14px 4px 14px 44px; color: #ffffff; outline: none; caret-color: #87a96b; } .ds-pair-field input:focus { outline: 2px solid #87a96b; outline-offset: -2px; } .ds-pair-copy { flex-shrink: 0; width: 32px; height: 32px; margin-right: 8px; border: none; background: transparent; color: #999999; cursor: pointer; }"
     },
     {
       "name": "Rate Field",
@@ -46,7 +38,7 @@
       "name": "Copy Button",
       "kind": "custom",
       "refersTo": "input-field",
-      "description": "Sits beside USD, AED, Received Amount, and Our Comm. Same border language as inputs (2px Signal White, zero radius). Copies the value exactly as displayed, prefix included. On success the drawn copy-glyph swaps to a checkmark and the border/icon turn Sage for about a second, then revert — momentary confirmation, not a standing accent claim. The three amount-field buttons dim to 35% opacity and drop hover response when their field is empty; Our Comm's button has no empty state since it always shows a real amount.",
+      "description": "Standalone next to Our Comm and Export: same border language as inputs (2px Signal White, zero radius). A pair variant lives inside each Twin Pair Field segment instead — borderless, transparent, gray until hovered — one per currency face (USD gets its own, AED gets its own), each copying only its own segment's value with its own prefix, never a combined string. On success the drawn copy-glyph swaps to a checkmark and the border/icon (or just icon color, for the borderless pair variant) turn Sage for about a second, then revert — momentary confirmation, not a standing accent claim. Every copy button dims when there's nothing to copy in its own field; Our Comm's button has no empty state since it always shows a real amount.",
       "html": "<button type=\"button\" class=\"ds-copy-btn\" aria-label=\"Copy amount\"><svg class=\"ds-icon-copy\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\"></rect><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"></path></svg><svg class=\"ds-icon-check\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"></polyline></svg></button>",
       "css": ".ds-copy-btn { width: 44px; border: 2px solid #ffffff; border-radius: 0; background: #000000; color: #ffffff; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; } .ds-copy-btn:hover, .ds-copy-btn:focus-visible { border-color: #87a96b; color: #87a96b; outline: none; } .ds-copy-btn.copied { border-color: #87a96b; color: #87a96b; } .ds-copy-btn .ds-icon-check { display: none; } .ds-copy-btn.copied .ds-icon-copy { display: none; } .ds-copy-btn.copied .ds-icon-check { display: block; }"
     },
@@ -59,37 +51,49 @@
       "css": ".ds-fx-rate { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: #999999; } .ds-fx-rate input { width: 68px; font-size: 12px; font-weight: 700; padding: 4px 6px; border: 2px solid #999999; border-radius: 0; background: #000000; color: #ffffff; text-align: center; outline: none; } .ds-fx-rate input:focus { border-color: #87a96b; outline: 2px solid #87a96b; outline-offset: 2px; }"
     },
     {
+      "name": "Reset Button",
+      "kind": "custom",
+      "refersTo": "input-field",
+      "description": "Sits immediately after the Exchange Rate Field. Quieter than the field itself: a tiny borderless single-arc-with-arrowhead glyph (not the two-square copy glyph), gray until hovered, no confirmation flash of its own since the visible effect (the rate field's value changing back) is the confirmation. One tap restores the default 3.6725 and re-derives everything through the exact same recompute path the rate field's own input handler uses.",
+      "html": "<button type=\"button\" class=\"ds-fx-reset\" aria-label=\"Reset exchange rate to default\"><svg viewBox=\"0 0 24 24\" width=\"14\" height=\"14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 12a9 9 0 1 0 3-6.7\"></path><path d=\"M3 3v6h6\"></path></svg></button>",
+      "css": ".ds-fx-reset { width: 18px; height: 18px; border: none; background: transparent; color: #999999; cursor: pointer; } .ds-fx-reset:hover, .ds-fx-reset:focus-visible { color: #87a96b; outline: none; }"
+    },
+    {
       "name": "Export Button",
       "kind": "custom",
       "refersTo": "input-field",
-      "description": "Full-width action at the bottom of the card. Same border/confirmation language as the Copy Button, but carries a visible uppercase label (swaps to 'Copied' on success, not just an icon) since it's the one action meant to be found by reading rather than icon recognition. Copies every field as one organized text block in the card's own reading order. Disabled/dimmed when there's no AED principal entered.",
+      "description": "Full-width action at the bottom of the page. Same border/confirmation language as the Copy Button, but carries a visible uppercase label (swaps to 'Copied' on success, not just an icon) since it's the one action meant to be found by reading rather than icon recognition. Copies every field as one organized text block in the page's own reading order. Disabled/dimmed when there's no AED principal entered.",
       "html": "<button type=\"button\" class=\"ds-export-btn\"><svg class=\"ds-icon-copy\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\"></rect><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"></path></svg><span>Export Summary</span></button>",
       "css": ".ds-export-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 16px; border: 2px solid #ffffff; border-radius: 0; background: #000000; color: #ffffff; font-size: 13px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; } .ds-export-btn:hover, .ds-export-btn:focus-visible { border-color: #87a96b; color: #87a96b; outline: none; } .ds-export-btn:disabled { opacity: 0.35; cursor: default; }"
     },
     {
       "name": "Commission Ledger",
       "kind": "custom",
-      "refersTo": "card",
-      "description": "Service Comm, a centered '+', Our Comm (drawn in Sage), a rule, then Comm Main (the sum, bolder and larger) — the addition is drawn literally so a reader can verify Comm Main equals Service Comm + Our Comm without doing the math themselves. Comm Main's label spells out its combined rate as '(X% of AED)'.",
+      "refersTo": "input-field",
+      "description": "Service Comm, a centered '+', Our Comm (drawn in Sage), a rule, then Comm Main at the SAME size and weight as the two rows above it — the addition is drawn literally so a reader can verify Comm Main equals Service Comm + Our Comm without doing the math themselves, and the sum never gets to look heavier than its own parts just for being the total. Comm Main's label spells out its combined rate as '(X% of AED)'.",
       "html": "<div class=\"ds-ledger\"><div class=\"ds-row\"><span class=\"ds-row-label\">Service Comm</span><span class=\"ds-row-val\">AED 0.00</span></div><div class=\"ds-ledger-op\">+</div><div class=\"ds-row ds-accent\"><span class=\"ds-row-label\">Our Comm</span><span class=\"ds-row-val\">AED 0.00</span></div><div class=\"ds-ledger-rule\"></div><div class=\"ds-row ds-sum\"><span class=\"ds-row-label\">Comm Main (0.98% of AED)</span><span class=\"ds-row-val\">AED 0.00</span></div></div>",
-      "css": ".ds-ledger { display: flex; flex-direction: column; gap: 10px; } .ds-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; } .ds-row-label { color: #999999; } .ds-row-val { color: #ffffff; font-weight: 700; font-variant-numeric: tabular-nums; } .ds-ledger-op { text-align: center; font-weight: 800; color: #999999; } .ds-row.ds-accent .ds-row-label, .ds-row.ds-accent .ds-row-val { color: #87a96b; } .ds-ledger-rule { height: 2px; background: #ffffff; margin: 4px 0 2px; } .ds-row.ds-sum .ds-row-label { color: #ffffff; } .ds-row.ds-sum .ds-row-val { font-size: 24px; font-weight: 900; }"
+      "css": ".ds-ledger { display: flex; flex-direction: column; gap: 10px; } .ds-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; } .ds-row-label { color: #999999; } .ds-row-val { color: #ffffff; font-weight: 700; font-variant-numeric: tabular-nums; } .ds-ledger-op { text-align: center; font-weight: 800; color: #999999; } .ds-row.ds-accent .ds-row-label, .ds-row.ds-accent .ds-row-val { color: #87a96b; } .ds-ledger-rule { height: 2px; background: #ffffff; margin: 4px 0 2px; } .ds-row.ds-sum .ds-row-label { color: #ffffff; }"
     }
   ],
   "narrative": {
     "northStar": "The Trading Terminal",
-    "overview": "Everything here reads like a clean instrument panel: black field, crisp white rules, tracked uppercase labels, and exactly one calm accent reserved for the number that matters. There's no ornament and no rounded softness, but the tone is measured rather than urgent — a quiet readout, not a warning light. Weight does the talking: nothing on screen is drawn lighter than 700, so even the smallest label stays clear and legible without needing to shout.",
+    "overview": "Everything here reads like a clean instrument panel: black field, crisp white rules, tracked uppercase labels, and exactly one calm accent reserved for the number that matters. There's no ornament and no rounded softness, but the tone is measured rather than urgent — a quiet readout, not a warning light. Weight does the talking: nothing on screen is drawn lighter than 700, so even the smallest label stays clear and legible without needing to shout. There is no outer card: the black page itself is the canvas, and structure comes entirely from each element's own earned border.",
     "keyCharacteristics": [
       "Void-black field with crisp white 2-3px rules standing in for all depth and separation",
       "Exactly one calm accent color (Sage), spent only on Our Comm's row text, the owner's own earnings",
       "All type at 700-900 weight; uppercase, tracked labels; tabular numerals throughout",
       "Zero border-radius everywhere — every shape is a clean rectangle",
-      "No shadows at all — the border alone defines the card; function over form",
-      "Every percentage names what it applies to, and every sum is drawn as a literal addition (a '+' between its parts, a rule, then the total) rather than left implicit"
+      "No shadows at all — borders alone define structure; function over form",
+      "Every percentage names what it applies to, and every sum is drawn as a literal addition (a '+' between its parts, a rule, then the total) rather than left implicit",
+      "Twin currency values (Amount, Received Amount) share one bordered box, stacked top over bottom and split by an internal rule, never two separate fields that merely sit near each other",
+      "No outer card — the black page itself is the canvas; borders exist only where an individual element earns one"
     ],
     "rules": [
       { "name": "The One Accent Rule", "body": "As a standing mark of ownership, the accent color lives in exactly one place: Our Comm's own label and value text, the owner's own earnings. Everywhere else stays black, white, or gray. The one exception is momentary: any copy button's brief post-click confirmation also turns Sage, since that is feedback about an action just taken, not a standing claim about a number's importance — it fades in about a second, on whichever button was pressed.", "section": "colors" },
       { "name": "The No Regular Weight Rule", "body": "Nothing on this screen is drawn below font-weight 700 — thin or regular type stays out of this system, keeping labels legible without any of them needing to be loud about it.", "section": "typography" },
       { "name": "The No Decoration Rule", "body": "A border defines a boundary; it does not also need a shadow to prove it. If a visual device isn't load-bearing for reading the numbers, it doesn't ship.", "section": "elevation" },
+      { "name": "The Twin Pair Rule", "body": "Two values that are the same underlying amount expressed differently (USD vs. AED) are drawn inside one shared border, stacked top over bottom and split by an internal rule — never as two independent-looking fields that merely sit near each other, and never split side by side at the cost of either face's legibility. A shared container is the claim 'these are one thing'; proximity alone never makes that claim.", "section": "layout" },
+      { "name": "The Earned Border Rule", "body": "A border is drawn only where it groups or bounds something real — a twin pair, an input, a button. It is never a default wrapper applied to content that doesn't need one; the page itself is the outermost frame, not a card.", "section": "layout" },
       { "name": "The Shown-Sum Rule", "body": "A value that is the sum of two others is never just placed near them — the addition itself is drawn: the parts, a '+', a rule, then the total. A reader should be able to verify the arithmetic from the page alone, without doing it in their head.", "section": "layout" }
     ],
     "dos": [
@@ -97,14 +101,21 @@
       "Do keep every border and rule hard-edged (0px radius) and at least 2px thick.",
       "Do keep text weight at 700+ everywhere; no thin or regular type.",
       "Do draw every sum as a literal addition — parts, '+', rule, total — the Shown-Sum Rule.",
-      "Do name what a percentage applies to wherever it's shown or entered — a bare '%' is never enough on its own."
+      "Do name what a percentage applies to wherever it's shown or entered — a bare '%' is never enough on its own.",
+      "Do wrap twin values (the same amount in two currencies) in one shared border, stacked top over bottom — the Twin Pair Rule.",
+      "Do keep every ledger row (Service Comm, Our Comm, Comm Main) at the same size and weight — a sum earns its position, never a bigger font.",
+      "Do order the page to match the calculation's own dependency chain — Received Amount sits last because it's computed last, not because it matters least.",
+      "Do draw a border only where it groups or bounds something real — the Earned Border Rule."
     ],
     "donts": [
-      "Don't add any shadow, soft or hard — the border alone defines the card; depth cues are decoration this system doesn't spend on.",
+      "Don't add any shadow, soft or hard — borders alone define structure; depth cues are decoration this system doesn't spend on.",
       "Don't load an external webfont; the app must render and cache fully offline.",
       "Don't give Comm Main its own independently-editable rate — it must always equal Service Comm + Our Comm exactly, per PRODUCT.md's calculation model.",
       "Don't reach for an urgent or alarm-style color for the accent — the whole point of this palette is that the one signal color reads as calm, not urgent.",
-      "Don't pull a value out of its natural sum for emphasis — mark it with color in place instead, so the sum stays whole and visible."
+      "Don't pull a value out of its natural sum for emphasis — mark it with color in place instead, so the sum stays whole and visible.",
+      "Don't draw twin currency values as two separate bordered boxes, or split them side by side — proximity alone doesn't read as 'these are one value,' and splitting the width in half costs both faces legibility.",
+      "Don't enlarge a sum's font size or weight relative to the values it's summing — Comm Main is proven by the addition it sits in, not by looking heavier than Service Comm or Our Comm.",
+      "Don't wrap the whole page in an outer card — the black page is already the frame; a container around everything is a border with nothing left to bound."
     ]
   }
 }

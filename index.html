@@ -29,21 +29,52 @@
       flex-direction: column;
       align-items: center;
     }
-    .card { background: var(--black); border: 3px solid var(--white); border-radius: 0; padding: 24px; width: 100%; max-width: 380px; }
+    /* No outer card: the black page itself is the canvas. Structure comes
+       from each element's own border (Twin Pair Fields, rate inputs, the
+       export button) rather than one containing frame around everything. */
+    .content { width: 100%; max-width: 380px; }
     label { display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); margin-bottom: 8px; }
     .input-wrapper { position: relative; display: flex; align-items: stretch; gap: 8px; margin-bottom: 20px; }
     .currency-prefix { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 20px; font-weight: 800; color: var(--white); pointer-events: none; }
     input { width: 100%; font-size: 28px; font-weight: 800; padding: 12px 14px; border-radius: 0; border: 2px solid var(--white); background: var(--black); color: var(--white); outline: none; caret-color: var(--accent); transition: border-color 0.15s, outline-color 0.15s; font-variant-numeric: tabular-nums; }
     input::placeholder { color: var(--gray); }
     input:focus { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: 2px; }
-    #usd { padding-left: 30px; }
-    #aed, #received { padding-left: 62px; }
+
+    /* Twin pair: Amount and Received Amount each show USD and AED as siblings
+       sharing one bordered box, stacked top over bottom and split by one
+       internal horizontal rule, rather than two independent fields — the
+       shared border is what makes them read as one unit with two faces, not
+       two coincidentally-adjacent inputs. Stacking (not side-by-side) gives
+       each face the full width, room enough to stay legible at a size close
+       to a real primary input. Each face carries its own small copy
+       affordance inline, borderless, so it reads as part of that face
+       rather than a third segment competing with the twin structure itself. */
+    .pair-group { margin-bottom: 20px; }
+    .pair-box { display: flex; flex-direction: column; border: 2px solid var(--white); border-radius: 0; background: var(--black); }
+    .pair-field { min-width: 0; position: relative; display: flex; align-items: center; }
+    .pair-field + .pair-field { border-top: 2px solid var(--white); }
+    .pair-prefix { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; font-weight: 800; color: var(--gray); pointer-events: none; }
+    .pair-field input { flex: 1; min-width: 0; border: none; background: transparent; font-size: 22px; padding: 14px 4px 14px 44px; }
+    .pair-field input:focus { outline: 2px solid var(--accent); outline-offset: -2px; }
+    .pair-mini-copy { flex-shrink: 0; width: 32px; height: 32px; margin-right: 8px; border: none; background: transparent; color: var(--gray); display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; transition: color 0.15s, opacity 0.15s; }
+    .pair-mini-copy:hover, .pair-mini-copy:focus-visible { color: var(--accent); outline: none; }
+    .pair-mini-copy.copied { color: var(--accent); }
+    .pair-mini-copy .icon-check { display: none; }
+    .pair-mini-copy.copied .icon-copy { display: none; }
+    .pair-mini-copy.copied .icon-check { display: block; }
+    .pair-mini-copy:disabled { opacity: 0.3; cursor: default; }
+    .pair-mini-copy:disabled:hover { color: var(--gray); }
+    .pair-mini-copy svg { width: 15px; height: 15px; }
 
     /* Deliberately quiet: no full label above it, gray (not white) border,
-       small footprint — adjustable without competing with the real inputs. */
+       small footprint — adjustable without competing with the real inputs.
+       The reset icon is quieter still: borderless, tiny, gray until hovered. */
     .fx-rate { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: var(--gray); margin: 0 0 20px; }
     .fx-rate input { width: 68px; font-size: 12px; font-weight: 700; padding: 4px 6px; border: 2px solid var(--gray); border-radius: 0; background: var(--black); color: var(--white); text-align: center; outline: none; caret-color: var(--accent); }
     .fx-rate input:focus { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: 2px; }
+    .fx-reset { flex-shrink: 0; width: 18px; height: 18px; margin-left: 2px; border: none; background: transparent; color: var(--gray); display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; }
+    .fx-reset:hover, .fx-reset:focus-visible { color: var(--accent); outline: none; }
+    .fx-reset svg { width: 13px; height: 13px; }
 
     /* Copy buttons: same border language as inputs, flat, no motion flourish.
        Two icons live in the DOM; .copied toggles which one shows. */
@@ -69,20 +100,21 @@
 
     .divider { height: 2px; background: var(--white); margin: 4px 0 16px; }
 
-    .breakdown { display: flex; flex-direction: column; gap: 14px; }
+    .breakdown { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
     .row { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--white); }
     .row .label { flex: 1; color: var(--gray); margin-bottom: 0; font-size: 13px; }
     .row .val { font-variant-numeric: tabular-nums; font-weight: 700; }
 
     /* The commission ledger: Service Comm + Our Comm, added, equal Comm Main.
-       The addition is drawn literally so the sum is never just implied. */
+       The addition is drawn literally so the sum is never just implied.
+       Comm Main is styled at the same size/weight as its two parts — the
+       sum isn't a bigger number, just the last one in the addition. */
     .ledger { display: flex; flex-direction: column; gap: 10px; }
     .ledger-op { text-align: center; font-size: 14px; font-weight: 800; color: var(--gray); }
     .ledger .row.accent-row .label,
     .ledger .row.accent-row .val { color: var(--accent); }
     .ledger-divider { height: 2px; background: var(--white); margin: 4px 0 2px; }
-    .ledger .row.sum-row .label { color: var(--white); font-size: 14px; }
-    .ledger .row.sum-row .val { font-size: 24px; font-weight: 900; }
+    .ledger .row.sum-row .label { color: var(--white); }
 
     /* The main export action: same flat border language as everything else,
        just full-width and carrying a visible label since it's the one button
@@ -99,40 +131,35 @@
 </head>
 <body>
 
-  <div class="card">
-    <label for="usd">Amount (USD)</label>
-    <div class="input-wrapper">
-      <span class="currency-prefix">$</span>
-      <input type="text" id="usd" placeholder="0.00" inputmode="decimal" autofocus>
-      <button type="button" class="copy-btn" id="usdCopy" aria-label="Copy USD amount" disabled>
-        <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-        <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-      </button>
-    </div>
-
-    <label for="aed">Amount (AED)</label>
-    <div class="input-wrapper">
-      <span class="currency-prefix">AED</span>
-      <input type="text" id="aed" placeholder="0.00" inputmode="decimal">
-      <button type="button" class="copy-btn" id="aedCopy" aria-label="Copy AED amount" disabled>
-        <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-        <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-      </button>
+  <div class="content">
+    <div class="pair-group">
+      <label>Amount</label>
+      <div class="pair-box">
+        <div class="pair-field">
+          <span class="pair-prefix">$</span>
+          <input type="text" id="amountUsd" placeholder="0.00" inputmode="decimal" autofocus>
+          <button type="button" class="pair-mini-copy" id="amountUsdCopy" aria-label="Copy USD amount" disabled>
+            <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </button>
+        </div>
+        <div class="pair-field">
+          <span class="pair-prefix">AED</span>
+          <input type="text" id="amountAed" placeholder="0.00" inputmode="decimal">
+          <button type="button" class="pair-mini-copy" id="amountAedCopy" aria-label="Copy AED amount" disabled>
+            <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </button>
+        </div>
+      </div>
     </div>
 
     <div class="fx-rate">
       <span>1 USD =</span>
       <input type="text" id="fxRate" value="3.6725" inputmode="decimal" aria-label="USD to AED exchange rate">
       <span>AED</span>
-    </div>
-
-    <label for="received">Received Amount</label>
-    <div class="input-wrapper">
-      <span class="currency-prefix">AED</span>
-      <input type="text" id="received" placeholder="0.00" inputmode="decimal">
-      <button type="button" class="copy-btn" id="receivedCopy" aria-label="Copy received amount" disabled>
-        <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-        <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      <button type="button" class="fx-reset" id="fxReset" aria-label="Reset exchange rate to default">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v6h6"></path></svg>
       </button>
     </div>
 
@@ -179,6 +206,28 @@
       </div>
     </div>
 
+    <div class="pair-group">
+      <label>Received Amount</label>
+      <div class="pair-box">
+        <div class="pair-field">
+          <span class="pair-prefix">$</span>
+          <input type="text" id="receivedUsd" placeholder="0.00" inputmode="decimal">
+          <button type="button" class="pair-mini-copy" id="receivedUsdCopy" aria-label="Copy received USD amount" disabled>
+            <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </button>
+        </div>
+        <div class="pair-field">
+          <span class="pair-prefix">AED</span>
+          <input type="text" id="receivedAed" placeholder="0.00" inputmode="decimal">
+          <button type="button" class="pair-mini-copy" id="receivedAedCopy" aria-label="Copy received AED amount" disabled>
+            <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <button type="button" class="export-btn" id="exportBtn" aria-label="Copy full transfer summary" disabled>
       <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
       <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -187,37 +236,44 @@
   </div>
 
   <script>
-    const usdInput = document.getElementById('usd');
-    const aedInput = document.getElementById('aed');
-    const receivedInput = document.getElementById('received');
+    const amountUsdInput = document.getElementById('amountUsd');
+    const amountAedInput = document.getElementById('amountAed');
+    const receivedUsdInput = document.getElementById('receivedUsd');
+    const receivedAedInput = document.getElementById('receivedAed');
     const fxRateInput = document.getElementById('fxRate');
+    const fxResetBtn = document.getElementById('fxReset');
     const servicePctInput = document.getElementById('servicePct');
     const ourPctInput = document.getElementById('ourPct');
+
+    const DEFAULT_FX_RATE = 3.6725;
 
     // USD -> AED rate: no network lookup, but adjustable in the UI (defaults
     // to the AED peg) rather than hardcoded, so it stays a single source of
     // truth with the field the user actually sees and can edit.
-    let USD_TO_AED = parseFloat(fxRateInput.value) || 3.6725;
+    let USD_TO_AED = parseFloat(fxRateInput.value) || DEFAULT_FX_RATE;
 
     const commPctLabelEl = document.getElementById('commPctLabel');
     const commMainEl = document.getElementById('commMain');
     const serviceCommEl = document.getElementById('serviceComm');
     const ourCommEl = document.getElementById('ourComm');
 
-    const usdCopyBtn = document.getElementById('usdCopy');
-    const aedCopyBtn = document.getElementById('aedCopy');
-    const receivedCopyBtn = document.getElementById('receivedCopy');
+    const amountUsdCopyBtn = document.getElementById('amountUsdCopy');
+    const amountAedCopyBtn = document.getElementById('amountAedCopy');
+    const receivedUsdCopyBtn = document.getElementById('receivedUsdCopy');
+    const receivedAedCopyBtn = document.getElementById('receivedAedCopy');
     const ourCommCopyBtn = document.getElementById('ourCommCopy');
     const exportBtn = document.getElementById('exportBtn');
 
-    // Copy buttons for USD/AED/Received (and the export button) disable
-    // themselves when there's no AED principal yet — nothing to copy, shown
-    // rather than left as a silent no-op.
+    // Each mini copy button gates off its own field (they're always kept in
+    // sync, so this is equivalent to gating off the pair, but reads simpler);
+    // the export button gates off the AED principal — nothing to copy yet
+    // shows as disabled rather than a silent no-op.
     function syncCopyButtons() {
-      usdCopyBtn.disabled = !usdInput.value.trim();
-      aedCopyBtn.disabled = !aedInput.value.trim();
-      receivedCopyBtn.disabled = !receivedInput.value.trim();
-      exportBtn.disabled = !aedInput.value.trim();
+      amountUsdCopyBtn.disabled = !amountUsdInput.value.trim();
+      amountAedCopyBtn.disabled = !amountAedInput.value.trim();
+      receivedUsdCopyBtn.disabled = !receivedUsdInput.value.trim();
+      receivedAedCopyBtn.disabled = !receivedAedInput.value.trim();
+      exportBtn.disabled = !amountAedInput.value.trim();
     }
 
     const fmtAED = (num) => 'AED ' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -258,7 +314,7 @@
         input.value = formatFixed(parseNum(input.value));
       });
     }
-    [usdInput, aedInput, receivedInput, servicePctInput, ourPctInput].forEach(formatOnBlur);
+    [amountUsdInput, amountAedInput, receivedUsdInput, receivedAedInput, servicePctInput, ourPctInput].forEach(formatOnBlur);
 
     // The exchange rate keeps its own precision (a peg like 3.6725 needs 4
     // decimal places, not the 2 every money field rounds to).
@@ -290,90 +346,87 @@
       return { servicePct: parseNum(servicePctInput.value), ourPct: parseNum(ourPctInput.value) };
     }
 
-    // Editing USD or AED sets the transfer principal; Received Amount and the
-    // whole breakdown follow from it.
-    usdInput.addEventListener('input', () => {
-      const usd = liveFormat(usdInput);
-      const aed = usd * USD_TO_AED;
+    // The single source of truth for every derived field: given the AED
+    // principal, this updates both twin pairs (Amount USD/AED, Received
+    // USD/AED) and the breakdown — except `skip`, the field the user is
+    // actually typing into, which keeps exactly what they typed rather than
+    // being reformatted out from under their cursor.
+    function applyFromAed(aed, skip) {
       const { servicePct, ourPct } = currentRates();
       const result = calcCommission(aed, servicePct, ourPct);
 
-      aedInput.value = usd ? formatFixed(aed) : '';
-      receivedInput.value = usd ? formatFixed(result.received) : '';
+      if (skip !== amountUsdInput) amountUsdInput.value = aed ? formatFixed(aed / USD_TO_AED) : '';
+      if (skip !== amountAedInput) amountAedInput.value = aed ? formatFixed(aed) : '';
+      if (skip !== receivedAedInput) receivedAedInput.value = aed ? formatFixed(result.received) : '';
+      if (skip !== receivedUsdInput) receivedUsdInput.value = aed ? formatFixed(result.received / USD_TO_AED) : '';
+
       renderBreakdown(result);
       syncCopyButtons();
+    }
+
+    // Editing either Amount field sets the transfer principal; both Received
+    // fields and the whole breakdown follow from it.
+    amountUsdInput.addEventListener('input', () => {
+      const usd = liveFormat(amountUsdInput);
+      applyFromAed(usd * USD_TO_AED, amountUsdInput);
     });
 
-    aedInput.addEventListener('input', () => {
-      const aed = liveFormat(aedInput);
-      const usd = aed / USD_TO_AED;
-      const { servicePct, ourPct } = currentRates();
-      const result = calcCommission(aed, servicePct, ourPct);
-
-      usdInput.value = aed ? formatFixed(usd) : '';
-      receivedInput.value = aed ? formatFixed(result.received) : '';
-      renderBreakdown(result);
-      syncCopyButtons();
+    amountAedInput.addEventListener('input', () => {
+      const aed = liveFormat(amountAedInput);
+      applyFromAed(aed, amountAedInput);
     });
 
-    // Editing Received Amount back-solves the AED principal (and USD) needed to
-    // net exactly that amount after commission, holding the current rates fixed.
-    receivedInput.addEventListener('input', () => {
-      const received = liveFormat(receivedInput);
+    // Editing either Received field back-solves the AED principal needed to
+    // net exactly that amount after commission, holding the current rates
+    // fixed, then cascades back out to both Amount fields.
+    receivedAedInput.addEventListener('input', () => {
+      const receivedAed = liveFormat(receivedAedInput);
       const { servicePct, ourPct } = currentRates();
-      const commPct = servicePct + ourPct;
-      const denom = 1 - commPct / 100;
-      const aed = denom > 0 ? received / denom : 0;
-      const usd = aed / USD_TO_AED;
-      const result = calcCommission(aed, servicePct, ourPct);
+      const denom = 1 - (servicePct + ourPct) / 100;
+      const aed = denom > 0 ? receivedAed / denom : 0;
+      applyFromAed(aed, receivedAedInput);
+    });
 
-      aedInput.value = received ? formatFixed(aed) : '';
-      usdInput.value = received ? formatFixed(usd) : '';
-      renderBreakdown(result);
-      syncCopyButtons();
+    receivedUsdInput.addEventListener('input', () => {
+      const receivedUsd = liveFormat(receivedUsdInput);
+      const receivedAed = receivedUsd * USD_TO_AED;
+      const { servicePct, ourPct } = currentRates();
+      const denom = 1 - (servicePct + ourPct) / 100;
+      const aed = denom > 0 ? receivedAed / denom : 0;
+      applyFromAed(aed, receivedUsdInput);
     });
 
     // Editing either rate keeps the current AED principal fixed and only
     // re-splits the commission, which changes Received Amount downstream.
     function onRateInput(input) {
       liveFormat(input);
-      const aed = parseNum(aedInput.value);
-      const { servicePct, ourPct } = currentRates();
-      const result = calcCommission(aed, servicePct, ourPct);
-
-      receivedInput.value = aedInput.value.trim() ? formatFixed(result.received) : '';
-      renderBreakdown(result);
-      syncCopyButtons();
+      applyFromAed(parseNum(amountAedInput.value), null);
     }
     servicePctInput.addEventListener('input', () => onRateInput(servicePctInput));
     ourPctInput.addEventListener('input', () => onRateInput(ourPctInput));
 
-    // Editing the exchange rate keeps whichever amount the user actually
-    // entered fixed (USD if present, else AED) and re-derives the other side
-    // and the whole breakdown at the new rate.
+    // Recomputes from the current fx rate, holding whichever Amount side the
+    // user actually entered fixed (USD if present, else AED). Shared by the
+    // rate field's own input handler and the reset button.
+    function recomputeFromRate() {
+      if (amountUsdInput.value.trim()) {
+        applyFromAed(parseNum(amountUsdInput.value) * USD_TO_AED, amountUsdInput);
+      } else if (amountAedInput.value.trim()) {
+        applyFromAed(parseNum(amountAedInput.value), amountAedInput);
+      }
+    }
+
     fxRateInput.addEventListener('input', () => {
       const rate = liveFormat(fxRateInput);
       if (rate <= 0) return;
       USD_TO_AED = rate;
+      recomputeFromRate();
+    });
 
-      const { servicePct, ourPct } = currentRates();
-
-      if (usdInput.value.trim()) {
-        const usd = parseNum(usdInput.value);
-        const aed = usd * USD_TO_AED;
-        const result = calcCommission(aed, servicePct, ourPct);
-        aedInput.value = formatFixed(aed);
-        receivedInput.value = formatFixed(result.received);
-        renderBreakdown(result);
-      } else if (aedInput.value.trim()) {
-        const aed = parseNum(aedInput.value);
-        const usd = aed / USD_TO_AED;
-        const result = calcCommission(aed, servicePct, ourPct);
-        usdInput.value = formatFixed(usd);
-        receivedInput.value = formatFixed(result.received);
-        renderBreakdown(result);
-      }
-      syncCopyButtons();
+    fxResetBtn.addEventListener('click', () => {
+      fxRateInput.value = String(DEFAULT_FX_RATE);
+      USD_TO_AED = DEFAULT_FX_RATE;
+      recomputeFromRate();
     });
 
     // Initial render (all fields empty)
@@ -427,21 +480,22 @@
       });
     }
 
-    setupCopyButton(usdCopyBtn, () => usdInput.value.trim() ? '$' + usdInput.value.trim() : '', 'USD amount');
-    setupCopyButton(aedCopyBtn, () => aedInput.value.trim() ? 'AED ' + aedInput.value.trim() : '', 'AED amount');
-    setupCopyButton(receivedCopyBtn, () => receivedInput.value.trim() ? 'AED ' + receivedInput.value.trim() : '', 'received amount');
+    // Each face of a twin pair copies its own value with its own currency
+    // prefix — back to one copy action per currency, not one per pair.
+    setupCopyButton(amountUsdCopyBtn, () => amountUsdInput.value.trim() ? `$${amountUsdInput.value.trim()}` : '', 'USD amount');
+    setupCopyButton(amountAedCopyBtn, () => amountAedInput.value.trim() ? `AED ${amountAedInput.value.trim()}` : '', 'AED amount');
+    setupCopyButton(receivedUsdCopyBtn, () => receivedUsdInput.value.trim() ? `$${receivedUsdInput.value.trim()}` : '', 'received USD amount');
+    setupCopyButton(receivedAedCopyBtn, () => receivedAedInput.value.trim() ? `AED ${receivedAedInput.value.trim()}` : '', 'received AED amount');
     setupCopyButton(ourCommCopyBtn, () => ourCommEl.textContent, 'our commission amount');
 
     // The export button copies everything at once, laid out as a small
-    // labeled receipt in the same order the card itself reads: the transfer
-    // principal, the rates that drove the split, the commission ledger, then
-    // the bottom-line result.
+    // labeled receipt in the same order the page itself reads: the transfer
+    // principal, the rate, the rates that drove the split, the commission
+    // ledger, then the bottom-line result.
     function buildExportSummary() {
       return [
-        'HavCal Transfer Summary',
-        '------------------------',
-        `Amount (USD): $${usdInput.value.trim()}`,
-        `Amount (AED): AED ${aedInput.value.trim()}`,
+        `Amount (USD): $${amountUsdInput.value.trim()}`,
+        `Amount (AED): AED ${amountAedInput.value.trim()}`,
         `Rate: 1 USD = ${fxRateInput.value.trim()} AED`,
         '',
         `Service Rate: ${servicePctInput.value.trim()}%`,
@@ -450,7 +504,8 @@
         `Our Comm: ${ourCommEl.textContent}`,
         `Comm Main (${commPctLabelEl.textContent}% of AED): ${commMainEl.textContent}`,
         '',
-        `Received Amount: AED ${receivedInput.value.trim()}`,
+        `Received Amount (USD): $${receivedUsdInput.value.trim()}`,
+        `Received Amount (AED): AED ${receivedAedInput.value.trim()}`,
       ].join('\n');
     }
     setupCopyButton(exportBtn, buildExportSummary, 'transfer summary', exportBtn.querySelector('.export-label'));
