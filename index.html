@@ -20,14 +20,29 @@
     body { background: var(--black); color: var(--white); padding: 48px 16px 24px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
     .card { background: var(--black); border: 3px solid var(--white); border-radius: 0; padding: 24px; width: 100%; max-width: 380px; }
     label { display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); margin-bottom: 8px; }
-    .input-wrapper { position: relative; display: flex; align-items: center; margin-bottom: 20px; }
-    .currency-prefix { position: absolute; left: 14px; font-size: 20px; font-weight: 800; color: var(--white); pointer-events: none; }
+    .input-wrapper { position: relative; display: flex; align-items: stretch; gap: 8px; margin-bottom: 20px; }
+    .currency-prefix { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 20px; font-weight: 800; color: var(--white); pointer-events: none; }
     input { width: 100%; font-size: 28px; font-weight: 800; padding: 12px 14px; border-radius: 0; border: 2px solid var(--white); background: var(--black); color: var(--white); outline: none; caret-color: var(--accent); transition: border-color 0.15s, outline-color 0.15s; font-variant-numeric: tabular-nums; }
     input::placeholder { color: var(--gray); }
     input:focus { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: 2px; }
     #usd { padding-left: 30px; }
     #aed, #received { padding-left: 62px; }
 
+    /* Copy buttons: same border language as inputs, flat, no motion flourish.
+       Two icons live in the DOM; .copied toggles which one shows. */
+    .copy-btn { flex-shrink: 0; width: 44px; border: 2px solid var(--white); border-radius: 0; background: var(--black); color: var(--white); display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; transition: border-color 0.15s, color 0.15s, opacity 0.15s; }
+    .copy-btn:hover, .copy-btn:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+    .copy-btn.copied { border-color: var(--accent); color: var(--accent); }
+    .copy-btn .icon-check { display: none; }
+    .copy-btn.copied .icon-copy { display: none; }
+    .copy-btn.copied .icon-check { display: block; }
+    .copy-btn:disabled { opacity: 0.35; cursor: default; }
+    .copy-btn:disabled:hover { border-color: var(--white); color: var(--white); }
+    .copy-btn-sm { width: 26px; height: 26px; }
+    .copy-btn-sm svg { width: 13px; height: 13px; }
+
+    .rate-caption { font-size: 12px; color: var(--gray); margin-bottom: 10px; }
+    .rate-caption b { color: var(--white); font-weight: 800; }
     .rate-row { display: flex; gap: 12px; margin-bottom: 24px; }
     .rate-field { flex: 1; min-width: 0; }
     .rate-field label { font-size: 11px; }
@@ -38,16 +53,19 @@
     .divider { height: 2px; background: var(--white); margin: 4px 0 16px; }
 
     .breakdown { display: flex; flex-direction: column; gap: 14px; }
-    .row { display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: var(--white); }
-    .row .label { color: var(--gray); margin-bottom: 0; font-size: 13px; }
+    .row { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--white); }
+    .row .label { flex: 1; color: var(--gray); margin-bottom: 0; font-size: 13px; }
     .row .val { font-variant-numeric: tabular-nums; font-weight: 700; }
 
-    .comm-group { border-left: 2px solid var(--white); padding-left: 14px; margin-top: 2px; display: flex; flex-direction: column; gap: 10px; }
-    .comm-group .row { font-size: 14px; }
-
-    .total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; background: var(--accent); border: 2px solid var(--black); padding: 14px 16px; }
-    .total-row .label { font-size: 14px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--black); margin-bottom: 0; }
-    .total-row .val { font-size: 28px; font-weight: 900; color: var(--black); font-variant-numeric: tabular-nums; }
+    /* The commission ledger: Service Comm + Our Comm, added, equal Comm Main.
+       The addition is drawn literally so the sum is never just implied. */
+    .ledger { display: flex; flex-direction: column; gap: 10px; }
+    .ledger-op { text-align: center; font-size: 14px; font-weight: 800; color: var(--gray); }
+    .ledger .row.accent-row .label,
+    .ledger .row.accent-row .val { color: var(--accent); }
+    .ledger-divider { height: 2px; background: var(--white); margin: 4px 0 2px; }
+    .ledger .row.sum-row .label { color: var(--white); font-size: 14px; }
+    .ledger .row.sum-row .val { font-size: 24px; font-weight: 900; }
   </style>
 </head>
 <body>
@@ -57,30 +75,43 @@
     <div class="input-wrapper">
       <span class="currency-prefix">$</span>
       <input type="text" id="usd" placeholder="0.00" inputmode="decimal" autofocus>
+      <button type="button" class="copy-btn" id="usdCopy" aria-label="Copy USD amount" disabled>
+        <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </button>
     </div>
 
     <label for="aed">Amount (AED)</label>
     <div class="input-wrapper">
       <span class="currency-prefix">AED</span>
       <input type="text" id="aed" placeholder="0.00" inputmode="decimal">
+      <button type="button" class="copy-btn" id="aedCopy" aria-label="Copy AED amount" disabled>
+        <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </button>
     </div>
 
     <label for="received">Received Amount</label>
     <div class="input-wrapper">
       <span class="currency-prefix">AED</span>
       <input type="text" id="received" placeholder="0.00" inputmode="decimal">
+      <button type="button" class="copy-btn" id="receivedCopy" aria-label="Copy received amount" disabled>
+        <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </button>
     </div>
 
+    <div class="rate-caption">Both rates below apply to the <b>AED Amount</b> above.</div>
     <div class="rate-row">
       <div class="rate-field">
-        <label for="servicePct">Service Comm %</label>
+        <label for="servicePct">Service Rate %</label>
         <div class="input-wrapper">
           <span class="currency-prefix">%</span>
           <input type="text" id="servicePct" value="0.68" inputmode="decimal">
         </div>
       </div>
       <div class="rate-field">
-        <label for="ourPct">Our Comm %</label>
+        <label for="ourPct">Our Rate %</label>
         <div class="input-wrapper">
           <span class="currency-prefix">%</span>
           <input type="text" id="ourPct" value="0.30" inputmode="decimal">
@@ -91,21 +122,26 @@
     <div class="divider"></div>
 
     <div class="breakdown">
-      <div class="row">
-        <span class="label">Comm Main (<span id="commPctLabel">0.98</span>%)</span>
-        <span class="val" id="commMain">AED 0.00</span>
-      </div>
-      <div class="comm-group">
+      <div class="ledger">
         <div class="row">
           <span class="label">Service Comm</span>
           <span class="val" id="serviceComm">AED 0.00</span>
         </div>
+        <div class="ledger-op">+</div>
+        <div class="row accent-row">
+          <span class="label">Our Comm</span>
+          <span class="val" id="ourComm">AED 0.00</span>
+          <button type="button" class="copy-btn copy-btn-sm" id="ourCommCopy" aria-label="Copy our commission amount">
+            <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </button>
+        </div>
+        <div class="ledger-divider"></div>
+        <div class="row sum-row">
+          <span class="label">Comm Main (<span id="commPctLabel">0.98</span>% of AED)</span>
+          <span class="val" id="commMain">AED 0.00</span>
+        </div>
       </div>
-    </div>
-
-    <div class="total-row">
-      <span class="label">Our Comm</span>
-      <span class="val" id="ourComm">AED 0.00</span>
     </div>
   </div>
 
@@ -123,6 +159,19 @@
     const commMainEl = document.getElementById('commMain');
     const serviceCommEl = document.getElementById('serviceComm');
     const ourCommEl = document.getElementById('ourComm');
+
+    const usdCopyBtn = document.getElementById('usdCopy');
+    const aedCopyBtn = document.getElementById('aedCopy');
+    const receivedCopyBtn = document.getElementById('receivedCopy');
+    const ourCommCopyBtn = document.getElementById('ourCommCopy');
+
+    // Copy buttons for USD/AED/Received disable themselves when their field is
+    // empty — nothing to copy yet, shown rather than left as a silent no-op.
+    function syncCopyButtons() {
+      usdCopyBtn.disabled = !usdInput.value.trim();
+      aedCopyBtn.disabled = !aedInput.value.trim();
+      receivedCopyBtn.disabled = !receivedInput.value.trim();
+    }
 
     const fmtAED = (num) => 'AED ' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const parseNum = (str) => parseFloat(String(str).replace(/,/g, '')) || 0;
@@ -198,6 +247,7 @@
       aedInput.value = usd ? formatFixed(aed) : '';
       receivedInput.value = usd ? formatFixed(result.received) : '';
       renderBreakdown(result);
+      syncCopyButtons();
     });
 
     aedInput.addEventListener('input', () => {
@@ -209,6 +259,7 @@
       usdInput.value = aed ? formatFixed(usd) : '';
       receivedInput.value = aed ? formatFixed(result.received) : '';
       renderBreakdown(result);
+      syncCopyButtons();
     });
 
     // Editing Received Amount back-solves the AED principal (and USD) needed to
@@ -225,6 +276,7 @@
       aedInput.value = received ? formatFixed(aed) : '';
       usdInput.value = received ? formatFixed(usd) : '';
       renderBreakdown(result);
+      syncCopyButtons();
     });
 
     // Editing either rate keeps the current AED principal fixed and only
@@ -237,6 +289,7 @@
 
       receivedInput.value = aedInput.value.trim() ? formatFixed(result.received) : '';
       renderBreakdown(result);
+      syncCopyButtons();
     }
     servicePctInput.addEventListener('input', () => onRateInput(servicePctInput));
     ourPctInput.addEventListener('input', () => onRateInput(ourPctInput));
@@ -245,7 +298,50 @@
     {
       const { servicePct, ourPct } = currentRates();
       renderBreakdown(calcCommission(0, servicePct, ourPct));
+      syncCopyButtons();
     }
+
+    // Copy buttons: copy the value exactly as displayed (with its currency
+    // prefix), so what's copied matches what's on screen with no guessing.
+    async function copyText(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+
+    function setupCopyButton(button, getText, label) {
+      button.addEventListener('click', async () => {
+        const text = getText();
+        if (!text) return;
+        try {
+          await copyText(text);
+        } catch (err) {
+          console.error('Copy failed:', err);
+          return;
+        }
+        button.classList.add('copied');
+        button.setAttribute('aria-label', label + ' copied');
+        clearTimeout(button._copyTimeout);
+        button._copyTimeout = setTimeout(() => {
+          button.classList.remove('copied');
+          button.setAttribute('aria-label', 'Copy ' + label);
+        }, 1200);
+      });
+    }
+
+    setupCopyButton(usdCopyBtn, () => usdInput.value.trim() ? '$' + usdInput.value.trim() : '', 'USD amount');
+    setupCopyButton(aedCopyBtn, () => aedInput.value.trim() ? 'AED ' + aedInput.value.trim() : '', 'AED amount');
+    setupCopyButton(receivedCopyBtn, () => receivedInput.value.trim() ? 'AED ' + receivedInput.value.trim() : '', 'received amount');
+    setupCopyButton(ourCommCopyBtn, () => ourCommEl.textContent, 'our commission amount');
 
     // Register Service Worker with relative path
     if ('serviceWorker' in navigator) {

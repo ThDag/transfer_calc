@@ -37,12 +37,6 @@ components:
     typography: "{typography.numeric}"
     rounded: "{rounded.none}"
     padding: "12px 14px 12px 34px"
-  total-block:
-    backgroundColor: "{colors.calm-sage}"
-    textColor: "{colors.void-black}"
-    typography: "{typography.numeric}"
-    rounded: "{rounded.none}"
-    padding: "14px 16px"
 ---
 
 # Design System: Commission Calculator
@@ -57,17 +51,18 @@ The current palette and rates are an explicit first pass (see PRODUCT.md) — th
 
 **Key Characteristics:**
 - Void-black field with crisp white 2-3px rules standing in for all depth and separation
-- Exactly one calm accent color (Sage), spent only on Our Comm, the owner's own earnings
+- Exactly one calm accent color (Sage), spent only on Our Comm's row text, the owner's own earnings
 - All type at 700-900 weight; uppercase, tracked labels; tabular numerals throughout
 - Zero border-radius everywhere — every shape is a clean rectangle
 - No shadows at all — the border alone defines the card; function over form
+- Every percentage names what it applies to, and every sum is drawn as a literal addition (a "+" between its parts, a rule, then the total) rather than left implicit
 
 ## Colors
 
 Two neutrals, one accent, spent once.
 
 ### Primary
-- **Sage** (#87a96b): a calm, muted green reserved entirely for the Our Comm block — the owner's own earnings, and the one filled surface on the page. Never used for chrome, borders, Received Amount, Comm Main, or Service Comm.
+- **Sage** (#87a96b): a calm, muted green reserved entirely for the Our Comm row's label and value text — the owner's own earnings. Never used for chrome, borders, Received Amount, Comm Main, or Service Comm.
 
 ### Neutral
 - **Void Black** (#000000): page and card background.
@@ -75,7 +70,7 @@ Two neutrals, one accent, spent once.
 - **Concrete Gray** (#999999): secondary text — field label, row captions, placeholder text.
 
 ### Named Rules
-**The One Accent Rule.** The accent color appears in exactly one place: Our Comm, the owner's own earnings. Everywhere else — including Received Amount and Comm Main, both larger dollar figures — stays black, white, or gray, so when the accent shows up it simply marks "this is the number that's actually yours," calmly rather than urgently.
+**The One Accent Rule.** As a *standing* mark of ownership, the accent color lives in exactly one place: Our Comm's own label and value text, the owner's own earnings. Everywhere else — including Received Amount and Comm Main, both larger dollar figures — stays black, white, or gray. The one exception is *momentary*: any copy button's brief post-click confirmation also turns Sage, because that's feedback about an action just taken, not a standing claim about a number's importance — it fades in about a second, on whichever button was pressed, not just Our Comm's.
 
 ## Typography
 
@@ -92,12 +87,12 @@ Two neutrals, one accent, spent once.
 
 ## Layout
 
-Single centered console, no page grid: a 380px-max-width bordered card sits near the top of an otherwise empty black viewport. Vertical rhythm is deliberately coarse — 24px card padding, 14px gap between breakdown rows, a 2px white rule before the breakdown. Density stays low so the one accented block reads clearly.
+Single centered console, no page grid: a 380px-max-width bordered card sits near the top of an otherwise empty black viewport. Vertical rhythm is deliberately coarse — 24px card padding, 14px gap between breakdown rows, a 2px white rule before the breakdown. Density stays low so the ledger reads clearly.
 
-Information is arranged as a real tree, not a flat list, because the underlying math is a tree: three amount inputs — USD, AED, Received Amount — are stacked together as one fully bidirectional group (editing any one back-solves the other two), sitting above two adjustable rate inputs (Service Comm %, Our Comm %) side by side. Below the divider, Comm Main is the derived total, and Service Comm is drawn nested *under* it (indented, connected by a left rule) because it is Comm Main's child by construction (Comm Main is defined as the sum of Service Comm and Our Comm, never an independent figure). The nesting is the documentation: a reader should be able to tell the calculation's shape from the indentation alone, without reading a label.
+Information is arranged to make the calculation legible, not just correct. Three amount inputs — USD, AED, Received Amount — are stacked together as one fully bidirectional group (editing any one back-solves the other two), sitting above two adjustable rate inputs (Service Rate %, Our Rate %) side by side, captioned once ("Both rates below apply to the AED Amount above") so the base every percentage applies to is never ambiguous. Below the divider, Service Comm and Our Comm are drawn as an explicit addition ledger — a literal "+" between the two rows, a rule, then Comm Main labeled with its own combined percentage ("X% of AED") as the sum. Nothing about the relationship is left for the reader to infer from position alone.
 
 ### Named Rules
-**The Shape-Is-The-Math Rule.** A value that is derived as the sum of two other values is drawn nested under them, connected by a rule. Flattening a parent/child relationship into a plain list is a layout bug, not a style choice. **Exception:** the One Accent Rule outranks this one for exactly one row — Our Comm is mathematically Comm Main's child, but is promoted out of the nest into its own block because it's the headline number. A promotion needs the One Accent Rule's justification; it is not a second precedent for un-nesting anything else.
+**The Shown-Sum Rule.** A value that is the sum of two others is never just placed near them — the addition itself is drawn: the parts, a "+", a rule, then the total. A reader should be able to verify the arithmetic from the page alone, without doing it in their head.
 
 ## Elevation & Depth
 
@@ -108,7 +103,7 @@ No shadows anywhere, hard or soft. Depth is not simulated — the card is flat b
 
 ## Shapes
 
-Zero border-radius everywhere — the card, the input, and the total block are all clean rectangles. Solid 2–3px borders (white on black for the card and input; black on sage for the total block) stand in for the softness a shadow would otherwise supply.
+Zero border-radius everywhere — the card and every input are clean rectangles. Solid 2–3px white borders stand in for the softness a shadow would otherwise supply; the ledger's own rules (the "+" divider and the pre-sum rule) are the only other lines on the page.
 
 ## Components
 
@@ -124,28 +119,34 @@ Zero border-radius everywhere — the card, the input, and the total block are a
 - **Focus:** border and outline switch to Sage
 - **Placeholder:** Concrete Gray
 - **Linked amount group** (USD, AED, Received Amount): three full-size fields stacked together, all fully bidirectional — editing any one recomputes the other two and the whole breakdown below.
-- **Rate variant** (Service Comm %, Our Comm %): the same field at a smaller scale (18px value, `%` prefix) — two sit side by side in one row since they're peers, not a sequence.
+- **Rate variant** (Service Rate %, Our Rate %): the same field at a smaller scale (18px value, `%` prefix) — two sit side by side in one row since they're peers, not a sequence. A shared caption above the pair states what base they apply to, once, rather than repeating it on each label.
 - **Comma formatting is native to every field here**, not a separate feature: it live-reformats while typing (cursor preserved) and settles to a clean 2-decimal value on blur.
 
-### Nested Breakdown Row
-- **Style:** a 2px Signal White left rule with 14px padding, holding one or more standard rows
-- **Use:** wraps any figure that is mathematically a component of the row above it (currently: Service Comm, a child of Comm Main — Our Comm is also Comm Main's child but is promoted out per the Shape-Is-The-Math Rule's exception)
+### Copy Button
+- **Style:** 2px solid Signal White border, Void Black fill, zero radius — same border language as inputs, no separate visual system invented for it
+- **Icon:** a drawn copy glyph (two overlapping squares, one consistent stroke, corners squared to 0px to match the rest of the system) — never an emoji or a font icon
+- **Placement:** stretched to match its input's full height, sitting immediately to its right; inside the ledger it shrinks to a compact 26px square next to Our Comm's value
+- **Confirmation state:** on copy, the icon swaps to a checkmark and the border/icon turn Sage for about a second, then revert — the only place besides Our Comm's own text that the accent appears, and only for a moment, as a state change rather than a standing mark
+- **What it copies:** the value exactly as displayed, prefix included (e.g. "AED 3,636.51"), so there's never a mismatch between what's on screen and what lands on the clipboard
+- **Empty state:** the three amount-field buttons (USD, AED, Received) dim to 35% opacity and drop their hover response when their field is blank — nothing to copy, shown rather than a silent no-op tap. Our Comm's button has no empty state: it always shows a real amount, even AED 0.00.
 
-### Our Comm Block (the headline total)
-- **Style:** solid Sage fill, 2px Void Black border — the one filled surface on the page
-- **Weight:** 900 / 28px value, 800 / 14px uppercase label, both in Void Black for readable contrast on sage
-- **Why this row:** it's the owner's own earnings, not the largest number on the page — the accent marks ownership, not magnitude, and it does so calmly.
+### Commission Ledger
+- **Style:** a plain row (Service Comm), a centered gray "+" glyph, a second row in Sage (Our Comm), a 2px white rule, then a larger bold row (Comm Main) — the whole group reads top to bottom as one addition
+- **Why this shape:** the Shown-Sum Rule — the reader should never have to trust that Comm Main equals the two rows above it; the page proves it
+- **Our Comm's accent:** only its label and value text are drawn in Sage — no fill, no border, no separate block. It stays inside the ledger's natural addition order instead of being pulled out, so the sum stays visibly whole while the color still marks it as the owner's own number.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep the accent confined to the Our Comm block — the One Accent Rule.
+- **Do** keep the accent confined to Our Comm's own text — the One Accent Rule.
 - **Do** keep every border and rule hard-edged (0px radius) and at least 2px thick.
 - **Do** keep text weight at 700+ everywhere; no thin or regular type.
-- **Do** draw a derived value nested under the values it's derived from — the Shape-Is-The-Math Rule.
+- **Do** draw every sum as a literal addition — parts, "+", rule, total — the Shown-Sum Rule.
+- **Do** name what a percentage applies to wherever it's shown or entered — a bare "%" is never enough on its own.
 
 ### Don't:
 - **Don't** add any shadow, soft or hard — the border alone defines the card; depth cues are decoration this system doesn't spend on.
 - **Don't** load an external webfont; the app must render and cache fully offline.
 - **Don't** give Comm Main its own independently-editable rate — it must always equal Service Comm + Our Comm exactly, per PRODUCT.md's calculation model.
 - **Don't** reach for an urgent or alarm-style color for the accent — the whole point of this palette is that the one signal color reads as calm, not urgent.
+- **Don't** pull a value out of its natural sum for emphasis — mark it with color in place instead, so the sum stays whole and visible (see the Commission Ledger).
