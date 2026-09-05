@@ -1,4 +1,4 @@
-const CACHE_NAME = 'commission-calc-v6';
+const CACHE_NAME = 'havcal-v7';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

@@ -18,6 +18,10 @@ Computes a money-transfer (havale) commission breakdown: a USD amount is convert
 ## Operating Context
 Used on an iPhone, added to the home screen, expected to work with no internet connection (airplane mode / cellular dead zones). All three files (index.html, sw.js, manifest.json) must be served together over HTTPS for the service worker and install prompt to function; GitHub Pages is the current deploy target.
 
+**App name: HavCal.** Set in three places that all must agree: `manifest.json` (`name` and `short_name`), the `apple-mobile-web-app-title` meta tag, and `<title>` — iOS reads the home-screen icon label from the meta tag (not just the manifest), so all three need to change together on any future rename.
+
+**No page scroll/bounce by design.** The card is meant to fit the viewport exactly; `html, body` are locked to `height: 100%; overflow: hidden; overscroll-behavior: none;` specifically to kill iOS's rubber-band bounce on the standalone home-screen app (the classic cause of an apparently-scrollable page even when content fits — `min-height: 100vh` plus native elastic overscroll, not real content overflow). Padding uses `env(safe-area-inset-*)` (`viewport-fit=cover` in the viewport meta) instead of a hardcoded guess, so it adapts correctly across notch, Dynamic Island, and non-notch iPhones. Trade-off: if the card ever grows taller than the smallest supported screen (iPhone SE-class), content will clip at the bottom instead of scrolling — verify on a real small device before adding content, since this can't be checked without a browser here.
+
 ## Capabilities and Constraints
 - Three fully bidirectional amount inputs, not a single one-way input: **USD**, **AED**, and **Received Amount** can each be edited directly, and editing any one back-solves the other two (plus Service Comm % and Our Comm % are independently editable rate inputs). Editing any of the five recomputes every derived figure.
 - **Fixed exchange rate: 1 USD = 3.6725 AED** — the official, decades-stable USD/AED peg. Hardcoded, no network call, confirmed with the user.

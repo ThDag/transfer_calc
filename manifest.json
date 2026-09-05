@@ -1,6 +1,6 @@
 {
-  "name": "Commission Calculator",
-  "short_name": "Calculator",
+  "name": "HavCal",
+  "short_name": "HavCal",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#000000",
