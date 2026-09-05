@@ -7,15 +7,13 @@
       "void-black": { "role": "neutral", "displayName": "Void Black", "canonical": "#000000", "tonalRamp": ["#000000", "#0d0d0d", "#1a1a1a", "#262626", "#333333", "#404040", "#4d4d4d", "#5a5a5a"] },
       "signal-white": { "role": "neutral", "displayName": "Signal White", "canonical": "#ffffff", "tonalRamp": ["#a6a6a6", "#b3b3b3", "#c0c0c0", "#cccccc", "#d9d9d9", "#e6e6e6", "#f2f2f2", "#ffffff"] },
       "concrete-gray": { "role": "neutral", "displayName": "Concrete Gray", "canonical": "#999999", "tonalRamp": ["#404040", "#4d4d4d", "#5a5a5a", "#666666", "#737373", "#808080", "#8c8c8c", "#999999"] },
-      "alarm-red": { "role": "primary", "displayName": "Alarm Red", "canonical": "#ff2400", "tonalRamp": ["#330800", "#661000", "#991800", "#cc2000", "#ff2400", "#ff5233", "#ff8066", "#ffad99"] }
+      "calm-sage": { "role": "primary", "displayName": "Sage", "canonical": "#87a96b", "tonalRamp": ["#1c2417", "#38492f", "#546d46", "#70915e", "#87a96b", "#a1bd8c", "#bbd1ad", "#d5e5ce"] }
     },
     "typographyMeta": {
       "label": { "displayName": "Label", "purpose": "Field name and row captions, uppercase, tracked." },
-      "numeric": { "displayName": "Numeric", "purpose": "The price input and every computed monetary value, tabular numerals." }
+      "numeric": { "displayName": "Numeric", "purpose": "Every amount input and computed monetary value, tabular numerals. The rate fields (Service Comm %, Our Comm %) use the same role at a smaller 18px size." }
     },
-    "shadows": [
-      { "name": "hard-offset", "value": "8px 8px 0 #ff2400", "purpose": "The card's only depth cue — a flat, zero-blur stamped block, never an ambient glow." }
-    ],
+    "shadows": [],
     "motion": [],
     "breakpoints": []
   },
@@ -26,49 +24,69 @@
       "refersTo": "card",
       "description": "The bordered black console holding the whole calculator.",
       "html": "<div class=\"ds-card\">Card content</div>",
-      "css": ".ds-card { background: #000000; color: #ffffff; border: 3px solid #ffffff; border-radius: 0; padding: 24px; box-shadow: 8px 8px 0 #ff2400; }"
+      "css": ".ds-card { background: #000000; color: #ffffff; border: 3px solid #ffffff; border-radius: 0; padding: 24px; }"
     },
     {
       "name": "Input Field",
       "kind": "input",
       "refersTo": "input-field",
-      "description": "The product price field — large tabular numerals, hard white border.",
-      "html": "<input class=\"ds-input\" type=\"number\" placeholder=\"0.00\">",
-      "css": ".ds-input { width: 100%; font-size: 28px; font-weight: 800; padding: 12px 14px 12px 34px; border-radius: 0; border: 2px solid #ffffff; background: #000000; color: #ffffff; outline: none; caret-color: #ff2400; } .ds-input::placeholder { color: #999999; } .ds-input:focus { border-color: #ff2400; outline: 2px solid #ff2400; outline-offset: 2px; }"
+      "description": "USD / AED / Received Amount fields — large tabular numerals, hard white border, all three fully bidirectionally linked, comma-grouped as you type.",
+      "html": "<input class=\"ds-input\" type=\"text\" inputmode=\"decimal\" placeholder=\"0.00\">",
+      "css": ".ds-input { width: 100%; font-size: 28px; font-weight: 800; padding: 12px 14px; border-radius: 0; border: 2px solid #ffffff; background: #000000; color: #ffffff; outline: none; caret-color: #87a96b; } .ds-input::placeholder { color: #999999; } .ds-input:focus { border-color: #87a96b; outline: 2px solid #87a96b; outline-offset: 2px; }"
     },
     {
-      "name": "Total Block",
+      "name": "Rate Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Service Comm % / Our Comm % — the same input at a smaller scale, two placed side by side since they are peers, not a sequence.",
+      "html": "<input class=\"ds-rate-input\" type=\"text\" inputmode=\"decimal\" value=\"0.68\">",
+      "css": ".ds-rate-input { width: 100%; font-size: 18px; font-weight: 800; padding: 10px 10px 10px 26px; border-radius: 0; border: 2px solid #ffffff; background: #000000; color: #ffffff; outline: none; caret-color: #87a96b; } .ds-rate-input:focus { border-color: #87a96b; outline: 2px solid #87a96b; outline-offset: 2px; }"
+    },
+    {
+      "name": "Nested Breakdown Row",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "Wraps a figure that is mathematically a component of the row above it (Service Comm is a child of Comm Main; Our Comm is too but is promoted out into its own headline block) — a left rule and indent make the parent/child relationship visible without a label.",
+      "html": "<div class=\"ds-nested\"><div class=\"ds-row\"><span class=\"ds-row-label\">Service Comm</span><span class=\"ds-row-val\">AED 0.00</span></div></div>",
+      "css": ".ds-nested { border-left: 2px solid #ffffff; padding-left: 14px; } .ds-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; } .ds-row-label { color: #999999; } .ds-row-val { color: #ffffff; font-weight: 700; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Our Comm Block",
       "kind": "custom",
       "refersTo": "total-block",
-      "description": "The Net Commission row — the page's one inverted, filled surface, in Alarm Red.",
-      "html": "<div class=\"ds-total\"><span class=\"ds-total-label\">Net Commission</span><span class=\"ds-total-val\">$0.00</span></div>",
-      "css": ".ds-total { display: flex; justify-content: space-between; align-items: center; background: #ff2400; border: 2px solid #000000; padding: 14px 16px; } .ds-total-label { font-size: 14px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #000000; } .ds-total-val { font-size: 28px; font-weight: 900; color: #000000; font-variant-numeric: tabular-nums; }"
+      "description": "The headline total — the owner's own earnings, the page's one filled surface, in calm Sage. Marks ownership, not magnitude: Received Amount and Comm Main are both larger figures and stay unaccented.",
+      "html": "<div class=\"ds-total\"><span class=\"ds-total-label\">Our Comm</span><span class=\"ds-total-val\">AED 0.00</span></div>",
+      "css": ".ds-total { display: flex; justify-content: space-between; align-items: center; background: #87a96b; border: 2px solid #000000; padding: 14px 16px; } .ds-total-label { font-size: 14px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #000000; } .ds-total-val { font-size: 28px; font-weight: 900; color: #000000; font-variant-numeric: tabular-nums; }"
     }
   ],
   "narrative": {
     "northStar": "The Trading Terminal",
-    "overview": "Everything here reads like a stripped instrument panel: black field, hard white rules, stenciled uppercase labels, and exactly one alarm color reserved for the number that matters. There is no ornament, no soft glow, no rounded comfort — the interface is a printed readout, not a friendly app. Weight does the talking: nothing on screen is drawn lighter than 700, so even the smallest label reads as a command, not a caption.",
+    "overview": "Everything here reads like a clean instrument panel: black field, crisp white rules, tracked uppercase labels, and exactly one calm accent reserved for the number that matters. There's no ornament and no rounded softness, but the tone is measured rather than urgent — a quiet readout, not a warning light. Weight does the talking: nothing on screen is drawn lighter than 700, so even the smallest label stays clear and legible without needing to shout.",
     "keyCharacteristics": [
-      "Void-black field with hard white 2-3px rules standing in for all depth and separation",
-      "Exactly one saturated color (Alarm Red), spent only on the final total",
+      "Void-black field with crisp white 2-3px rules standing in for all depth and separation",
+      "Exactly one calm accent color (Sage), spent only on Our Comm, the owner's own earnings",
       "All type at 700-900 weight; uppercase, tracked labels; tabular numerals throughout",
-      "Zero border-radius everywhere — every shape is a hard rectangle",
-      "A single flat, zero-blur offset shadow as the only depth cue on the page"
+      "Zero border-radius everywhere — every shape is a clean rectangle",
+      "No shadows at all — the border alone defines the card; function over form",
+      "Information is drawn as a real tree: Received Amount and Comm Main are siblings derived from AED; Service Comm nests under Comm Main because it is defined as part of its sum"
     ],
     "rules": [
-      { "name": "The One Alarm Rule", "body": "Red appears in exactly one place: the final commission total. Everywhere else is black, white, or gray, so when red shows up it means \"this is the number that matters.\"", "section": "colors" },
-      { "name": "The No Regular Weight Rule", "body": "Nothing on this screen is drawn below font-weight 700 — thin or regular type has no place in a brutalist instrument panel.", "section": "typography" },
-      { "name": "The Flat Stamp Rule", "body": "Depth is drawn as a hard offset block, never a blurred glow. Anything ambient is a foreign material in this system.", "section": "elevation" }
+      { "name": "The One Accent Rule", "body": "The accent color appears in exactly one place: Our Comm, the owner's own earnings. Everywhere else — including Received Amount and Comm Main, both larger dollar figures — stays black, white, or gray, so when the accent shows up it simply marks \"this is the number that's actually yours,\" calmly rather than urgently.", "section": "colors" },
+      { "name": "The No Regular Weight Rule", "body": "Nothing on this screen is drawn below font-weight 700 — thin or regular type stays out of this system, keeping labels legible without any of them needing to be loud about it.", "section": "typography" },
+      { "name": "The No Decoration Rule", "body": "A border defines a boundary; it does not also need a shadow to prove it. If a visual device isn't load-bearing for reading the numbers, it doesn't ship.", "section": "elevation" },
+      { "name": "The Shape-Is-The-Math Rule", "body": "A value that is derived as the sum of two other values is drawn nested under them, connected by a rule. Flattening a parent/child relationship into a plain list is a layout bug, not a style choice. Exception: the One Accent Rule outranks this one for exactly one row — Our Comm is mathematically Comm Main's child, but is promoted out of the nest into its own block because it's the headline number. A promotion needs the One Accent Rule's justification; it is not a second precedent for un-nesting anything else.", "section": "layout" }
     ],
     "dos": [
-      "Do keep red confined to the Net Commission block — the One Alarm Rule.",
+      "Do keep the accent confined to the Our Comm block — the One Accent Rule.",
       "Do keep every border and rule hard-edged (0px radius) and at least 2px thick.",
-      "Do keep text weight at 700+ everywhere; no thin or regular type."
+      "Do keep text weight at 700+ everywhere; no thin or regular type.",
+      "Do draw a derived value nested under the values it's derived from — the Shape-Is-The-Math Rule."
     ],
     "donts": [
-      "Don't add soft, blurred, or ambient shadows — only the flat offset block earns a shadow here.",
+      "Don't add any shadow, soft or hard — the border alone defines the card; depth cues are decoration this system doesn't spend on.",
       "Don't load an external webfont; the app must render and cache fully offline.",
-      "Don't treat the current commission rates (10% / 15% / 3%) as final — they're explicit placeholders per PRODUCT.md."
+      "Don't give Comm Main its own independently-editable rate — it must always equal Service Comm + Our Comm exactly, per PRODUCT.md's calculation model.",
+      "Don't reach for an urgent or alarm-style color for the accent — the whole point of this palette is that the one signal color reads as calm, not urgent."
     ]
   }
 }

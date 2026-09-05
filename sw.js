@@ -1,4 +1,4 @@
-const CACHE_NAME = 'commission-calc-v1';
+const CACHE_NAME = 'commission-calc-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

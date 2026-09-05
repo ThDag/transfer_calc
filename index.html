@@ -13,90 +13,239 @@
       --black: #000000;
       --white: #ffffff;
       --gray: #999999;
-      --accent: #ff2400;
+      --accent: #87a96b;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     ::selection { background: var(--accent); color: var(--black); }
     body { background: var(--black); color: var(--white); padding: 48px 16px 24px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
-    .card { background: var(--black); border: 3px solid var(--white); border-radius: 0; padding: 24px; width: 100%; max-width: 380px; box-shadow: 8px 8px 0 var(--accent); }
+    .card { background: var(--black); border: 3px solid var(--white); border-radius: 0; padding: 24px; width: 100%; max-width: 380px; }
     label { display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); margin-bottom: 8px; }
-    .input-wrapper { position: relative; display: flex; align-items: center; margin-bottom: 24px; }
-    .currency-prefix { position: absolute; left: 14px; font-size: 24px; font-weight: 800; color: var(--white); pointer-events: none; }
-    input { width: 100%; font-size: 28px; font-weight: 800; padding: 12px 14px 12px 34px; border-radius: 0; border: 2px solid var(--white); background: var(--black); color: var(--white); outline: none; caret-color: var(--accent); transition: border-color 0.15s, outline-color 0.15s; }
+    .input-wrapper { position: relative; display: flex; align-items: center; margin-bottom: 20px; }
+    .currency-prefix { position: absolute; left: 14px; font-size: 20px; font-weight: 800; color: var(--white); pointer-events: none; }
+    input { width: 100%; font-size: 28px; font-weight: 800; padding: 12px 14px; border-radius: 0; border: 2px solid var(--white); background: var(--black); color: var(--white); outline: none; caret-color: var(--accent); transition: border-color 0.15s, outline-color 0.15s; font-variant-numeric: tabular-nums; }
     input::placeholder { color: var(--gray); }
     input:focus { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: 2px; }
+    #usd { padding-left: 30px; }
+    #aed, #received { padding-left: 62px; }
+
+    .rate-row { display: flex; gap: 12px; margin-bottom: 24px; }
+    .rate-field { flex: 1; min-width: 0; }
+    .rate-field label { font-size: 11px; }
+    .rate-field .input-wrapper { margin-bottom: 0; }
+    .rate-field input { font-size: 18px; padding: 10px 10px 10px 26px; }
+    .rate-field .currency-prefix { font-size: 16px; left: 10px; }
+
+    .divider { height: 2px; background: var(--white); margin: 4px 0 16px; }
+
     .breakdown { display: flex; flex-direction: column; gap: 14px; }
     .row { display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: var(--white); }
-    .row .label { color: var(--gray); }
+    .row .label { color: var(--gray); margin-bottom: 0; font-size: 13px; }
     .row .val { font-variant-numeric: tabular-nums; font-weight: 700; }
-    .divider { height: 2px; background: var(--white); margin: 12px 0; }
-    .total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; background: var(--accent); border: 2px solid var(--black); padding: 14px 16px; }
-    .total-row .label { font-size: 14px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--black); }
+
+    .comm-group { border-left: 2px solid var(--white); padding-left: 14px; margin-top: 2px; display: flex; flex-direction: column; gap: 10px; }
+    .comm-group .row { font-size: 14px; }
+
+    .total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; background: var(--accent); border: 2px solid var(--black); padding: 14px 16px; }
+    .total-row .label { font-size: 14px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--black); margin-bottom: 0; }
     .total-row .val { font-size: 28px; font-weight: 900; color: var(--black); font-variant-numeric: tabular-nums; }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <label for="price">Product Price</label>
+    <label for="usd">Amount (USD)</label>
     <div class="input-wrapper">
       <span class="currency-prefix">$</span>
-      <input type="number" id="price" placeholder="0.00" inputmode="decimal" autofocus>
+      <input type="text" id="usd" placeholder="0.00" inputmode="decimal" autofocus>
     </div>
+
+    <label for="aed">Amount (AED)</label>
+    <div class="input-wrapper">
+      <span class="currency-prefix">AED</span>
+      <input type="text" id="aed" placeholder="0.00" inputmode="decimal">
+    </div>
+
+    <label for="received">Received Amount</label>
+    <div class="input-wrapper">
+      <span class="currency-prefix">AED</span>
+      <input type="text" id="received" placeholder="0.00" inputmode="decimal">
+    </div>
+
+    <div class="rate-row">
+      <div class="rate-field">
+        <label for="servicePct">Service Comm %</label>
+        <div class="input-wrapper">
+          <span class="currency-prefix">%</span>
+          <input type="text" id="servicePct" value="0.68" inputmode="decimal">
+        </div>
+      </div>
+      <div class="rate-field">
+        <label for="ourPct">Our Comm %</label>
+        <div class="input-wrapper">
+          <span class="currency-prefix">%</span>
+          <input type="text" id="ourPct" value="0.30" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
 
     <div class="breakdown">
       <div class="row">
-        <span class="label">Platform Fee (10%)</span>
-        <span class="val" id="fee">-$0.00</span>
+        <span class="label">Comm Main (<span id="commPctLabel">0.98</span>%)</span>
+        <span class="val" id="commMain">AED 0.00</span>
       </div>
-      <div class="row">
-        <span class="label">Adjusted Base</span>
-        <span class="val" id="base">$0.00</span>
+      <div class="comm-group">
+        <div class="row">
+          <span class="label">Service Comm</span>
+          <span class="val" id="serviceComm">AED 0.00</span>
+        </div>
       </div>
-      <div class="row">
-        <span class="label">Tier 1 Direct (15%)</span>
-        <span class="val" id="tier1">$0.00</span>
-      </div>
-      <div class="row">
-        <span class="label">Tier 2 Override (3%)</span>
-        <span class="val" id="tier2">$0.00</span>
-      </div>
+    </div>
 
-      <div class="divider"></div>
-
-      <div class="total-row">
-        <span class="label">Net Commission</span>
-        <span class="val" id="net">$0.00</span>
-      </div>
+    <div class="total-row">
+      <span class="label">Our Comm</span>
+      <span class="val" id="ourComm">AED 0.00</span>
     </div>
   </div>
 
   <script>
-    // Calculation Logic
-    const priceInput = document.getElementById('price');
-    const feeEl = document.getElementById('fee');
-    const baseEl = document.getElementById('base');
-    const tier1El = document.getElementById('tier1');
-    const tier2El = document.getElementById('tier2');
-    const netEl = document.getElementById('net');
+    // Fixed USD -> AED peg (no network needed)
+    const USD_TO_AED = 3.6725;
 
-    const fmt = (num) => '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const usdInput = document.getElementById('usd');
+    const aedInput = document.getElementById('aed');
+    const receivedInput = document.getElementById('received');
+    const servicePctInput = document.getElementById('servicePct');
+    const ourPctInput = document.getElementById('ourPct');
 
-    priceInput.addEventListener('input', () => {
-      const price = parseFloat(priceInput.value) || 0;
+    const commPctLabelEl = document.getElementById('commPctLabel');
+    const commMainEl = document.getElementById('commMain');
+    const serviceCommEl = document.getElementById('serviceComm');
+    const ourCommEl = document.getElementById('ourComm');
 
-      const fee = price * 0.10;
-      const base = price - fee;
-      const tier1 = base * 0.15;
-      const tier2 = base * 0.03;
-      const net = tier1 + tier2;
+    const fmtAED = (num) => 'AED ' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const parseNum = (str) => parseFloat(String(str).replace(/,/g, '')) || 0;
+    const formatFixed = (num) => num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-      feeEl.textContent = '-' + fmt(fee);
-      baseEl.textContent = fmt(base);
-      tier1El.textContent = fmt(tier1);
-      tier2El.textContent = fmt(tier2);
-      netEl.textContent = fmt(net);
+    // Reformats a field's own displayed text with thousands separators while the
+    // user is actively typing into it, preserving cursor position, and returns
+    // the clean numeric value typed so far (not rounded/padded, since typing is
+    // still in progress).
+    function liveFormat(input) {
+      const cursor = input.selectionStart;
+      const before = input.value;
+
+      let cleaned = before.replace(/,/g, '').replace(/[^\d.]/g, '');
+      const firstDot = cleaned.indexOf('.');
+      if (firstDot !== -1) {
+        cleaned = cleaned.slice(0, firstDot + 1) + cleaned.slice(firstDot + 1).replace(/\./g, '');
+      }
+
+      let [intPart, decPart] = cleaned.split('.');
+      intPart = (intPart || '').replace(/^0+(?=\d)/, '');
+      const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      const after = decPart !== undefined ? grouped + '.' + decPart : grouped;
+
+      input.value = after;
+      const newCursor = Math.max(0, cursor + (after.length - before.length));
+      input.setSelectionRange(newCursor, newCursor);
+
+      return parseFloat(cleaned) || 0;
+    }
+
+    // Reformat a field to a clean, fixed 2-decimal, comma-grouped value once the
+    // user leaves it (no cursor to preserve, so a full reformat is safe here).
+    function formatOnBlur(input) {
+      input.addEventListener('blur', () => {
+        if (!input.value.trim()) return;
+        input.value = formatFixed(parseNum(input.value));
+      });
+    }
+    [usdInput, aedInput, receivedInput, servicePctInput, ourPctInput].forEach(formatOnBlur);
+
+    // Commission math: CommMain is not its own rate, it is always exactly the sum
+    // of the two splits, so the two percentages can never drift out of sync with
+    // the total.
+    function calcCommission(aed, servicePct, ourPct) {
+      const commPct = servicePct + ourPct;
+      const serviceComm = aed * (servicePct / 100);
+      const ourComm = aed * (ourPct / 100);
+      const commMain = serviceComm + ourComm;
+      const received = aed - commMain;
+      return { commPct, serviceComm, ourComm, commMain, received };
+    }
+
+    function renderBreakdown({ commPct, serviceComm, ourComm, commMain }) {
+      commPctLabelEl.textContent = commPct.toLocaleString('en-US', { maximumFractionDigits: 2 });
+      commMainEl.textContent = fmtAED(commMain);
+      serviceCommEl.textContent = fmtAED(serviceComm);
+      ourCommEl.textContent = fmtAED(ourComm);
+    }
+
+    function currentRates() {
+      return { servicePct: parseNum(servicePctInput.value), ourPct: parseNum(ourPctInput.value) };
+    }
+
+    // Editing USD or AED sets the transfer principal; Received Amount and the
+    // whole breakdown follow from it.
+    usdInput.addEventListener('input', () => {
+      const usd = liveFormat(usdInput);
+      const aed = usd * USD_TO_AED;
+      const { servicePct, ourPct } = currentRates();
+      const result = calcCommission(aed, servicePct, ourPct);
+
+      aedInput.value = usd ? formatFixed(aed) : '';
+      receivedInput.value = usd ? formatFixed(result.received) : '';
+      renderBreakdown(result);
     });
+
+    aedInput.addEventListener('input', () => {
+      const aed = liveFormat(aedInput);
+      const usd = aed / USD_TO_AED;
+      const { servicePct, ourPct } = currentRates();
+      const result = calcCommission(aed, servicePct, ourPct);
+
+      usdInput.value = aed ? formatFixed(usd) : '';
+      receivedInput.value = aed ? formatFixed(result.received) : '';
+      renderBreakdown(result);
+    });
+
+    // Editing Received Amount back-solves the AED principal (and USD) needed to
+    // net exactly that amount after commission, holding the current rates fixed.
+    receivedInput.addEventListener('input', () => {
+      const received = liveFormat(receivedInput);
+      const { servicePct, ourPct } = currentRates();
+      const commPct = servicePct + ourPct;
+      const denom = 1 - commPct / 100;
+      const aed = denom > 0 ? received / denom : 0;
+      const usd = aed / USD_TO_AED;
+      const result = calcCommission(aed, servicePct, ourPct);
+
+      aedInput.value = received ? formatFixed(aed) : '';
+      usdInput.value = received ? formatFixed(usd) : '';
+      renderBreakdown(result);
+    });
+
+    // Editing either rate keeps the current AED principal fixed and only
+    // re-splits the commission, which changes Received Amount downstream.
+    function onRateInput(input) {
+      liveFormat(input);
+      const aed = parseNum(aedInput.value);
+      const { servicePct, ourPct } = currentRates();
+      const result = calcCommission(aed, servicePct, ourPct);
+
+      receivedInput.value = aedInput.value.trim() ? formatFixed(result.received) : '';
+      renderBreakdown(result);
+    }
+    servicePctInput.addEventListener('input', () => onRateInput(servicePctInput));
+    ourPctInput.addEventListener('input', () => onRateInput(ourPctInput));
+
+    // Initial render (all fields empty)
+    {
+      const { servicePct, ourPct } = currentRates();
+      renderBreakdown(calcCommission(0, servicePct, ourPct));
+    }
 
     // Register Service Worker with relative path
     if ('serviceWorker' in navigator) {
