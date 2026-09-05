@@ -34,6 +34,22 @@ Used on an iPhone, added to the home screen, expected to work with no internet c
   - Editing Service Comm % or Our Comm % holds the current AED principal fixed and only re-splits the commission, which moves Received Amount downstream.
 - **Thousands-separator formatting on every editable field** (USD, AED, Received Amount, Service Comm %, Our Comm %): live-formatted while typing (cursor-position preserved, not rounded mid-entry) and reformatted to a clean 2-decimal value on blur. Plain `<input type="number">` can't display commas, so these are `type="text" inputmode="decimal"` with custom parsing.
 - **Copy buttons on USD, AED, Received Amount, and Our Comm** (not on Service Comm or Comm Main — those weren't asked for): each copies the value exactly as displayed, including its currency prefix (e.g. "AED 3,636.51"), so what lands on the clipboard matches what's on screen. Uses the Clipboard API with an `execCommand` fallback for older WebView contexts; gives a brief visual confirmation (icon swaps to a checkmark, border turns to the accent color) for ~1.2s. The three amount-field copy buttons disable themselves (dimmed, no hover) whenever their field is empty — nothing to copy yet, shown rather than a silent no-op click; Our Comm's copy button stays always-enabled since it always shows a real formatted amount, even AED 0.00.
+- **A main "Export Summary" button** copies every field as one organized block of text, in the same reading order the card itself uses (USD/AED principal, then rates, then the commission ledger, then Received Amount as the bottom line):
+  ```
+  HavCal Transfer Summary
+  ------------------------
+  Amount (USD): $1,000.00
+  Amount (AED): AED 3,672.50
+
+  Service Rate: 0.68%
+  Our Rate: 0.30%
+  Service Comm: AED 24.97
+  Our Comm: AED 11.02
+  Comm Main (0.98% of AED): AED 35.99
+
+  Received Amount: AED 3,636.51
+  ```
+  Disabled (dimmed) whenever there's no AED principal entered yet. On success its visible label swaps to "Copied" (not just an icon swap, since it's the one button meant to be found by its text at a glance) for ~1.2s.
 - Information hierarchy: AED amount is the transfer principal; Received Amount and Comm Main are siblings derived from it (Received Amount is also a valid alternate entry point that back-solves the principal). Service Comm and Our Comm are shown as an explicit addition ledger (`Service Comm + Our Comm = Comm Main`, with a literal "+" between the two rows and a rule before the sum) rather than implying the sum through nesting — the split relationship is now shown, not just structurally implied.
 - **Both rate fields are labeled and captioned to make clear they apply to the AED Amount** (not USD, not Comm Main): "Service Rate %" / "Our Rate %", with a shared caption above them ("Both rates below apply to the AED Amount above"), and the Comm Main row spells out "(X% of AED)" rather than a bare percentage.
 - **OurComm is the headline number** — it is the owner's own earnings from the transfer, matching this tool's original purpose (checking what you personally earn), so it keeps the one visual accent in the design system (its row's text is drawn in the accent color within the ledger, no longer pulled into a separate block). RecievedAmount and ServiceComm are shown but not specially emphasized.

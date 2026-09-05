@@ -51,6 +51,14 @@
       "css": ".ds-copy-btn { width: 44px; border: 2px solid #ffffff; border-radius: 0; background: #000000; color: #ffffff; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; } .ds-copy-btn:hover, .ds-copy-btn:focus-visible { border-color: #87a96b; color: #87a96b; outline: none; } .ds-copy-btn.copied { border-color: #87a96b; color: #87a96b; } .ds-copy-btn .ds-icon-check { display: none; } .ds-copy-btn.copied .ds-icon-copy { display: none; } .ds-copy-btn.copied .ds-icon-check { display: block; }"
     },
     {
+      "name": "Export Button",
+      "kind": "custom",
+      "refersTo": "input-field",
+      "description": "Full-width action at the bottom of the card. Same border/confirmation language as the Copy Button, but carries a visible uppercase label (swaps to 'Copied' on success, not just an icon) since it's the one action meant to be found by reading rather than icon recognition. Copies every field as one organized text block in the card's own reading order. Disabled/dimmed when there's no AED principal entered.",
+      "html": "<button type=\"button\" class=\"ds-export-btn\"><svg class=\"ds-icon-copy\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\"></rect><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"></path></svg><span>Export Summary</span></button>",
+      "css": ".ds-export-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 16px; border: 2px solid #ffffff; border-radius: 0; background: #000000; color: #ffffff; font-size: 13px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; } .ds-export-btn:hover, .ds-export-btn:focus-visible { border-color: #87a96b; color: #87a96b; outline: none; } .ds-export-btn:disabled { opacity: 0.35; cursor: default; }"
+    },
+    {
       "name": "Commission Ledger",
       "kind": "custom",
       "refersTo": "card",

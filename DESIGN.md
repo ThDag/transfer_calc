@@ -130,6 +130,12 @@ Zero border-radius everywhere — the card and every input are clean rectangles.
 - **What it copies:** the value exactly as displayed, prefix included (e.g. "AED 3,636.51"), so there's never a mismatch between what's on screen and what lands on the clipboard
 - **Empty state:** the three amount-field buttons (USD, AED, Received) dim to 35% opacity and drop their hover response when their field is blank — nothing to copy, shown rather than a silent no-op tap. Our Comm's button has no empty state: it always shows a real amount, even AED 0.00.
 
+### Export Button
+- **Style:** the same border and confirmation language as the Copy Button, but full-width and carrying a visible uppercase label instead of relying on icon recognition alone — it's the one action on the page meant to be found by reading, not by memorizing a glyph
+- **What it copies:** every field as one organized block of text, in the card's own reading order (USD/AED principal, rates, the commission ledger, then Received Amount as the bottom line) — see PRODUCT.md for the exact format
+- **Confirmation:** on success its label swaps to "Copied" (not just the icon) for about a second, alongside the same Sage border/icon flash as every other copy button
+- **Disabled state:** dims whenever there's no AED principal entered — nothing meaningful to export yet
+
 ### Commission Ledger
 - **Style:** a plain row (Service Comm), a centered gray "+" glyph, a second row in Sage (Our Comm), a 2px white rule, then a larger bold row (Comm Main) — the whole group reads top to bottom as one addition
 - **Why this shape:** the Shown-Sum Rule — the reader should never have to trust that Comm Main equals the two rows above it; the page proves it

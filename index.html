@@ -77,6 +77,18 @@
     .ledger-divider { height: 2px; background: var(--white); margin: 4px 0 2px; }
     .ledger .row.sum-row .label { color: var(--white); font-size: 14px; }
     .ledger .row.sum-row .val { font-size: 24px; font-weight: 900; }
+
+    /* The main export action: same flat border language as everything else,
+       just full-width and carrying a visible label since it's the one button
+       on the page meant to be found at a glance, not just recognized by icon. */
+    .export-btn { width: 100%; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 16px; border: 2px solid var(--white); border-radius: 0; background: var(--black); color: var(--white); font-size: 13px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: border-color 0.15s, color 0.15s, opacity 0.15s; }
+    .export-btn:hover, .export-btn:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+    .export-btn.copied { border-color: var(--accent); color: var(--accent); }
+    .export-btn:disabled { opacity: 0.35; cursor: default; }
+    .export-btn:disabled:hover { border-color: var(--white); color: var(--white); }
+    .export-btn .icon-check { display: none; }
+    .export-btn.copied .icon-copy { display: none; }
+    .export-btn.copied .icon-check { display: block; }
   </style>
 </head>
 <body>
@@ -154,6 +166,12 @@
         </div>
       </div>
     </div>
+
+    <button type="button" class="export-btn" id="exportBtn" aria-label="Copy full transfer summary" disabled>
+      <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      <span class="export-label">Export Summary</span>
+    </button>
   </div>
 
   <script>
@@ -175,13 +193,16 @@
     const aedCopyBtn = document.getElementById('aedCopy');
     const receivedCopyBtn = document.getElementById('receivedCopy');
     const ourCommCopyBtn = document.getElementById('ourCommCopy');
+    const exportBtn = document.getElementById('exportBtn');
 
-    // Copy buttons for USD/AED/Received disable themselves when their field is
-    // empty — nothing to copy yet, shown rather than left as a silent no-op.
+    // Copy buttons for USD/AED/Received (and the export button) disable
+    // themselves when there's no AED principal yet — nothing to copy, shown
+    // rather than left as a silent no-op.
     function syncCopyButtons() {
       usdCopyBtn.disabled = !usdInput.value.trim();
       aedCopyBtn.disabled = !aedInput.value.trim();
       receivedCopyBtn.disabled = !receivedInput.value.trim();
+      exportBtn.disabled = !aedInput.value.trim();
     }
 
     const fmtAED = (num) => 'AED ' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -329,8 +350,13 @@
       document.body.removeChild(ta);
     }
 
-    function setupCopyButton(button, getText, label) {
+    // `textEl` is optional: the export button has a visible label to swap to
+    // "Copied", where the small icon-only field buttons rely on the icon swap
+    // (and aria-label) alone.
+    function setupCopyButton(button, getText, label, textEl) {
+      const idleText = textEl ? textEl.textContent : null;
       button.addEventListener('click', async () => {
+        if (button.disabled) return;
         const text = getText();
         if (!text) return;
         try {
@@ -341,10 +367,12 @@
         }
         button.classList.add('copied');
         button.setAttribute('aria-label', label + ' copied');
+        if (textEl) textEl.textContent = 'Copied';
         clearTimeout(button._copyTimeout);
         button._copyTimeout = setTimeout(() => {
           button.classList.remove('copied');
           button.setAttribute('aria-label', 'Copy ' + label);
+          if (textEl) textEl.textContent = idleText;
         }, 1200);
       });
     }
@@ -353,6 +381,28 @@
     setupCopyButton(aedCopyBtn, () => aedInput.value.trim() ? 'AED ' + aedInput.value.trim() : '', 'AED amount');
     setupCopyButton(receivedCopyBtn, () => receivedInput.value.trim() ? 'AED ' + receivedInput.value.trim() : '', 'received amount');
     setupCopyButton(ourCommCopyBtn, () => ourCommEl.textContent, 'our commission amount');
+
+    // The export button copies everything at once, laid out as a small
+    // labeled receipt in the same order the card itself reads: the transfer
+    // principal, the rates that drove the split, the commission ledger, then
+    // the bottom-line result.
+    function buildExportSummary() {
+      return [
+        'HavCal Transfer Summary',
+        '------------------------',
+        `Amount (USD): $${usdInput.value.trim()}`,
+        `Amount (AED): AED ${aedInput.value.trim()}`,
+        '',
+        `Service Rate: ${servicePctInput.value.trim()}%`,
+        `Our Rate: ${ourPctInput.value.trim()}%`,
+        `Service Comm: ${serviceCommEl.textContent}`,
+        `Our Comm: ${ourCommEl.textContent}`,
+        `Comm Main (${commPctLabelEl.textContent}% of AED): ${commMainEl.textContent}`,
+        '',
+        `Received Amount: AED ${receivedInput.value.trim()}`,
+      ].join('\n');
+    }
+    setupCopyButton(exportBtn, buildExportSummary, 'transfer summary', exportBtn.querySelector('.export-label'));
 
     // Register Service Worker with relative path
     if ('serviceWorker' in navigator) {
