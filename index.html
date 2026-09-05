@@ -9,22 +9,30 @@
   <link rel="manifest" href="./manifest.json">
   <title>Commission Calculator</title>
   <style>
+    :root {
+      --black: #000000;
+      --white: #ffffff;
+      --gray: #999999;
+      --accent: #ff2400;
+    }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #0f172a; color: #f8fafc; padding: 48px 16px 24px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
-    .card { background: #1e293b; border: 1px solid #334155; border-radius: 20px; padding: 24px; width: 100%; max-width: 380px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); }
-    label { display: block; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 8px; }
+    ::selection { background: var(--accent); color: var(--black); }
+    body { background: var(--black); color: var(--white); padding: 48px 16px 24px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+    .card { background: var(--black); border: 3px solid var(--white); border-radius: 0; padding: 24px; width: 100%; max-width: 380px; box-shadow: 8px 8px 0 var(--accent); }
+    label { display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gray); margin-bottom: 8px; }
     .input-wrapper { position: relative; display: flex; align-items: center; margin-bottom: 24px; }
-    .currency-prefix { position: absolute; left: 14px; font-size: 24px; font-weight: 600; color: #64748b; pointer-events: none; }
-    input { width: 100%; font-size: 28px; font-weight: bold; padding: 12px 14px 12px 34px; border-radius: 12px; border: 1px solid #334155; background: #0b1120; color: #f8fafc; outline: none; transition: border-color 0.2s; }
-    input:focus { border-color: #38bdf8; }
+    .currency-prefix { position: absolute; left: 14px; font-size: 24px; font-weight: 800; color: var(--white); pointer-events: none; }
+    input { width: 100%; font-size: 28px; font-weight: 800; padding: 12px 14px 12px 34px; border-radius: 0; border: 2px solid var(--white); background: var(--black); color: var(--white); outline: none; caret-color: var(--accent); transition: border-color 0.15s, outline-color 0.15s; }
+    input::placeholder { color: var(--gray); }
+    input:focus { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: 2px; }
     .breakdown { display: flex; flex-direction: column; gap: 14px; }
-    .row { display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: #cbd5e1; }
-    .row .label { color: #94a3b8; }
-    .row .val { font-variant-numeric: tabular-nums; font-weight: 500; }
-    .divider { height: 1px; background: #334155; margin: 8px 0; }
-    .total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
-    .total-row .label { font-size: 16px; font-weight: 600; color: #f8fafc; }
-    .total-row .val { font-size: 24px; font-weight: 700; color: #38bdf8; font-variant-numeric: tabular-nums; }
+    .row { display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: var(--white); }
+    .row .label { color: var(--gray); }
+    .row .val { font-variant-numeric: tabular-nums; font-weight: 700; }
+    .divider { height: 2px; background: var(--white); margin: 12px 0; }
+    .total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; background: var(--accent); border: 2px solid var(--black); padding: 14px 16px; }
+    .total-row .label { font-size: 14px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--black); }
+    .total-row .val { font-size: 28px; font-weight: 900; color: var(--black); font-variant-numeric: tabular-nums; }
   </style>
 </head>
 <body>
