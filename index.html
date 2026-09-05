@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Calculator">
+  <link rel="manifest" href="./manifest.json">
+  <title>Commission Calculator</title>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #0f172a; color: #f8fafc; padding: 48px 16px 24px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 20px; padding: 24px; width: 100%; max-width: 380px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4); }
+    label { display: block; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 8px; }
+    .input-wrapper { position: relative; display: flex; align-items: center; margin-bottom: 24px; }
+    .currency-prefix { position: absolute; left: 14px; font-size: 24px; font-weight: 600; color: #64748b; pointer-events: none; }
+    input { width: 100%; font-size: 28px; font-weight: bold; padding: 12px 14px 12px 34px; border-radius: 12px; border: 1px solid #334155; background: #0b1120; color: #f8fafc; outline: none; transition: border-color 0.2s; }
+    input:focus { border-color: #38bdf8; }
+    .breakdown { display: flex; flex-direction: column; gap: 14px; }
+    .row { display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: #cbd5e1; }
+    .row .label { color: #94a3b8; }
+    .row .val { font-variant-numeric: tabular-nums; font-weight: 500; }
+    .divider { height: 1px; background: #334155; margin: 8px 0; }
+    .total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+    .total-row .label { font-size: 16px; font-weight: 600; color: #f8fafc; }
+    .total-row .val { font-size: 24px; font-weight: 700; color: #38bdf8; font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <label for="price">Product Price</label>
+    <div class="input-wrapper">
+      <span class="currency-prefix">$</span>
+      <input type="number" id="price" placeholder="0.00" inputmode="decimal" autofocus>
+    </div>
+
+    <div class="breakdown">
+      <div class="row">
+        <span class="label">Platform Fee (10%)</span>
+        <span class="val" id="fee">-$0.00</span>
+      </div>
+      <div class="row">
+        <span class="label">Adjusted Base</span>
+        <span class="val" id="base">$0.00</span>
+      </div>
+      <div class="row">
+        <span class="label">Tier 1 Direct (15%)</span>
+        <span class="val" id="tier1">$0.00</span>
+      </div>
+      <div class="row">
+        <span class="label">Tier 2 Override (3%)</span>
+        <span class="val" id="tier2">$0.00</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="total-row">
+        <span class="label">Net Commission</span>
+        <span class="val" id="net">$0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Calculation Logic
+    const priceInput = document.getElementById('price');
+    const feeEl = document.getElementById('fee');
+    const baseEl = document.getElementById('base');
+    const tier1El = document.getElementById('tier1');
+    const tier2El = document.getElementById('tier2');
+    const netEl = document.getElementById('net');
+
+    const fmt = (num) => '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    priceInput.addEventListener('input', () => {
+      const price = parseFloat(priceInput.value) || 0;
+
+      const fee = price * 0.10;
+      const base = price - fee;
+      const tier1 = base * 0.15;
+      const tier2 = base * 0.03;
+      const net = tier1 + tier2;
+
+      feeEl.textContent = '-' + fmt(fee);
+      baseEl.textContent = fmt(base);
+      tier1El.textContent = fmt(tier1);
+      tier2El.textContent = fmt(tier2);
+      netEl.textContent = fmt(net);
+    });
+
+    // Register Service Worker with relative path
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js', { scope: './' })
+          .catch((err) => console.error('SW registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>
