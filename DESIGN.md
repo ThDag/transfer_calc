@@ -130,6 +130,11 @@ Zero border-radius everywhere — the card and every input are clean rectangles.
 - **What it copies:** the value exactly as displayed, prefix included (e.g. "AED 3,636.51"), so there's never a mismatch between what's on screen and what lands on the clipboard
 - **Empty state:** the three amount-field buttons (USD, AED, Received) dim to 35% opacity and drop their hover response when their field is blank — nothing to copy, shown rather than a silent no-op tap. Our Comm's button has no empty state: it always shows a real amount, even AED 0.00.
 
+### Exchange Rate Field
+- **Style:** the one deliberately quiet control on the page — no full uppercase label above it, a thin-feeling inline sentence ("1 USD = [ ] AED") in 12px Concrete Gray instead of a bordered block with its own row. The input itself still keeps the system's 2px-border floor (just in gray, not white) and the same Sage focus treatment as every other field — quiet is achieved through absence of ceremony (no label, no copy button, tiny width), never by breaking the border-weight invariant.
+- **Why it's quiet:** it's an edge-case override (the AED peg almost never actually changes), not a primary input — it shouldn't compete with USD, AED, or Received Amount for attention, but it must still look editable, not like static text.
+- **Behavior:** editing it holds whichever of USD/AED is currently populated fixed and re-derives the other side; formatted to 4 decimal places on blur (its own precision, not the 2-decimal rule every money field uses).
+
 ### Export Button
 - **Style:** the same border and confirmation language as the Copy Button, but full-width and carrying a visible uppercase label instead of relying on icon recognition alone — it's the one action on the page meant to be found by reading, not by memorizing a glyph
 - **What it copies:** every field as one organized block of text, in the card's own reading order (USD/AED principal, rates, the commission ledger, then Received Amount as the bottom line) — see PRODUCT.md for the exact format

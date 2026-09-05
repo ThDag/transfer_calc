@@ -51,6 +51,14 @@
       "css": ".ds-copy-btn { width: 44px; border: 2px solid #ffffff; border-radius: 0; background: #000000; color: #ffffff; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; } .ds-copy-btn:hover, .ds-copy-btn:focus-visible { border-color: #87a96b; color: #87a96b; outline: none; } .ds-copy-btn.copied { border-color: #87a96b; color: #87a96b; } .ds-copy-btn .ds-icon-check { display: none; } .ds-copy-btn.copied .ds-icon-copy { display: none; } .ds-copy-btn.copied .ds-icon-check { display: block; }"
     },
     {
+      "name": "Exchange Rate Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "The one deliberately quiet control on the page: no full uppercase label, a thin inline sentence ('1 USD = [ ] AED') in 12px Concrete Gray rather than a bordered field with its own row. Still keeps the 2px-border floor (in gray, not white) and the same Sage focus treatment as every input — quiet via absence of ceremony (no label, no copy button, small width), never by thinning the border. Editing it holds whichever of USD/AED is populated fixed and re-derives the other side; formats to 4 decimal places on blur, not the 2-decimal rule every money field uses.",
+      "html": "<div class=\"ds-fx-rate\"><span>1 USD =</span><input type=\"text\" value=\"3.6725\"><span>AED</span></div>",
+      "css": ".ds-fx-rate { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: #999999; } .ds-fx-rate input { width: 68px; font-size: 12px; font-weight: 700; padding: 4px 6px; border: 2px solid #999999; border-radius: 0; background: #000000; color: #ffffff; text-align: center; outline: none; } .ds-fx-rate input:focus { border-color: #87a96b; outline: 2px solid #87a96b; outline-offset: 2px; }"
+    },
+    {
       "name": "Export Button",
       "kind": "custom",
       "refersTo": "input-field",

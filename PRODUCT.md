@@ -24,9 +24,9 @@ Used on an iPhone, added to the home screen, expected to work with no internet c
 
 ## Capabilities and Constraints
 - Three fully bidirectional amount inputs, not a single one-way input: **USD**, **AED**, and **Received Amount** can each be edited directly, and editing any one back-solves the other two (plus Service Comm % and Our Comm % are independently editable rate inputs). Editing any of the five recomputes every derived figure.
-- **Fixed exchange rate: 1 USD = 3.6725 AED** — the official, decades-stable USD/AED peg. Hardcoded, no network call, confirmed with the user.
+- **Exchange rate is adjustable, not hardcoded** — defaults to 3.6725 (the official USD/AED peg) but is a small, deliberately quiet inline field ("1 USD = [3.6725] AED", no full label, thin gray border, no copy button) placed between the AED and Received Amount fields, so it's editable without competing visually with the primary inputs. Still no network call — this is a manual override for the rare case the operator needs a different rate, not a live lookup. Editing it holds whichever amount is actually populated fixed (USD if present, else AED) and re-derives the other side plus the whole breakdown. Formatted to 4 decimal places on blur (2 isn't enough precision for a rate like 3.6725) rather than the 2-decimal formatting every money field uses.
 - **Calculation model** (confirmed with the user):
-  - `AED = USD × 3.6725` (bidirectional: editing AED back-solves USD, and vice versa)
+  - `AED = USD × FxRate` (FxRate defaults to 3.6725, user-adjustable; bidirectional: editing AED back-solves USD, and vice versa)
   - `ServiceComm = AED × ServiceCommPct / 100` (ServiceCommPct defaults to 0.68, meaning 0.68%)
   - `OurComm = AED × OurCommPct / 100` (OurCommPct defaults to 0.30, meaning 0.30%)
   - `CommMain = ServiceComm + OurComm` — **not** an independently-set rate; it is always exactly the sum of the two splits, so the splits can never drift out of sync with the total commission.
@@ -40,6 +40,7 @@ Used on an iPhone, added to the home screen, expected to work with no internet c
   ------------------------
   Amount (USD): $1,000.00
   Amount (AED): AED 3,672.50
+  Rate: 1 USD = 3.6725 AED
 
   Service Rate: 0.68%
   Our Rate: 0.30%
@@ -57,7 +58,7 @@ Used on an iPhone, added to the home screen, expected to work with no internet c
 - Must work fully offline once installed (service worker pre-caches all three files; cache bumped to v3 when Received Amount became editable).
 
 ## Evidence on Hand
-The USD/AED peg rate (3.6725) is a real, publicly documented, decades-stable central-bank peg — safe to treat as durable. The default split percentages (0.68% service, 0.30% ours) are the user's own real business defaults, confirmed directly, not placeholders. No other business data (customer names, volumes, historical transactions) has been provided — do not fabricate any.
+The USD/AED peg rate (3.6725) is a real, publicly documented, decades-stable central-bank peg — safe to treat as the durable default, though the field is user-adjustable for edge cases. The default split percentages (0.68% service, 0.30% ours) are the user's own real business defaults, confirmed directly, not placeholders. No other business data (customer names, volumes, historical transactions) has been provided — do not fabricate any.
 
 ## Product Principles
 - Offline-first: the app must never depend on a live network connection once installed.
