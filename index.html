@@ -76,18 +76,17 @@
     .fx-reset:hover, .fx-reset:focus-visible { color: var(--accent); outline: none; }
     .fx-reset svg { width: 13px; height: 13px; }
 
-    /* Copy buttons: same border language as inputs, flat, no motion flourish.
-       Two icons live in the DOM; .copied toggles which one shows. */
-    .copy-btn { flex-shrink: 0; width: 44px; border: 2px solid var(--white); border-radius: 0; background: var(--black); color: var(--white); display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; transition: border-color 0.15s, color 0.15s, opacity 0.15s; }
-    .copy-btn:hover, .copy-btn:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
-    .copy-btn.copied { border-color: var(--accent); color: var(--accent); }
-    .copy-btn .icon-check { display: none; }
-    .copy-btn.copied .icon-copy { display: none; }
-    .copy-btn.copied .icon-check { display: block; }
-    .copy-btn:disabled { opacity: 0.35; cursor: default; }
-    .copy-btn:disabled:hover { border-color: var(--white); color: var(--white); }
-    .copy-btn-sm { width: 26px; height: 26px; }
-    .copy-btn-sm svg { width: 13px; height: 13px; }
+    /* Tap-to-copy ledger values: no separate button, the value itself is the
+       control. Confirmation is a background/text invert flash rather than an
+       icon swap, since it has to read clearly even on Our Comm, whose text
+       is already Sage at rest — a color-only change there would be invisible. */
+    .val-copy { background: transparent; border: none; padding: 3px 6px; margin: -3px -6px; border-radius: 0; font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background 0.15s, color 0.15s; }
+    .val-copy:hover, .val-copy:focus-visible { color: var(--accent); outline: none; }
+    .val-copy.copied { background: var(--accent); color: var(--black); }
+    /* Our Comm's resting color rule below is a direct, equally-specific
+       selector on .val; this beats it outright so the invert still shows
+       even on text that's already Sage at rest. */
+    .ledger .row.accent-row .val-copy.copied { background: var(--accent); color: var(--black); }
 
     .rate-caption { font-size: 12px; color: var(--gray); margin-bottom: 10px; }
     .rate-caption b { color: var(--white); font-weight: 800; }
@@ -187,21 +186,17 @@
       <div class="ledger">
         <div class="row">
           <span class="label">Service Comm</span>
-          <span class="val" id="serviceComm">AED 0.00</span>
+          <button type="button" class="val val-copy" id="serviceComm" aria-label="Copy service commission amount">AED 0.00</button>
         </div>
         <div class="ledger-op">+</div>
         <div class="row accent-row">
           <span class="label">Our Comm</span>
-          <span class="val" id="ourComm">AED 0.00</span>
-          <button type="button" class="copy-btn copy-btn-sm" id="ourCommCopy" aria-label="Copy our commission amount">
-            <svg class="icon-copy" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            <svg class="icon-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          </button>
+          <button type="button" class="val val-copy" id="ourComm" aria-label="Copy our commission amount">AED 0.00</button>
         </div>
         <div class="ledger-divider"></div>
         <div class="row sum-row">
           <span class="label">Comm Main (<span id="commPctLabel">0.98</span>% of AED)</span>
-          <span class="val" id="commMain">AED 0.00</span>
+          <button type="button" class="val val-copy" id="commMain" aria-label="Copy commission main amount">AED 0.00</button>
         </div>
       </div>
     </div>
@@ -261,7 +256,6 @@
     const amountAedCopyBtn = document.getElementById('amountAedCopy');
     const receivedUsdCopyBtn = document.getElementById('receivedUsdCopy');
     const receivedAedCopyBtn = document.getElementById('receivedAedCopy');
-    const ourCommCopyBtn = document.getElementById('ourCommCopy');
     const exportBtn = document.getElementById('exportBtn');
 
     // Each mini copy button gates off its own field (they're always kept in
@@ -486,7 +480,33 @@
     setupCopyButton(amountAedCopyBtn, () => amountAedInput.value.trim() ? `AED ${amountAedInput.value.trim()}` : '', 'AED amount');
     setupCopyButton(receivedUsdCopyBtn, () => receivedUsdInput.value.trim() ? `$${receivedUsdInput.value.trim()}` : '', 'received USD amount');
     setupCopyButton(receivedAedCopyBtn, () => receivedAedInput.value.trim() ? `AED ${receivedAedInput.value.trim()}` : '', 'received AED amount');
-    setupCopyButton(ourCommCopyBtn, () => ourCommEl.textContent, 'our commission amount');
+
+    // Service Comm, Our Comm, and Comm Main have no separate copy button —
+    // the displayed value itself is the tap target. Confirmation is a
+    // background/text invert flash (`.copied`), not an icon swap, since
+    // there's no icon here and Our Comm's text is already Sage at rest.
+    function setupValueCopy(el, label) {
+      el.addEventListener('click', async () => {
+        const text = el.textContent;
+        if (!text) return;
+        try {
+          await copyText(text);
+        } catch (err) {
+          console.error('Copy failed:', err);
+          return;
+        }
+        el.classList.add('copied');
+        el.setAttribute('aria-label', label + ' copied');
+        clearTimeout(el._copyTimeout);
+        el._copyTimeout = setTimeout(() => {
+          el.classList.remove('copied');
+          el.setAttribute('aria-label', 'Copy ' + label);
+        }, 1200);
+      });
+    }
+    setupValueCopy(serviceCommEl, 'service commission amount');
+    setupValueCopy(ourCommEl, 'our commission amount');
+    setupValueCopy(commMainEl, 'commission main amount');
 
     // The export button copies everything at once, laid out as a small
     // labeled receipt in the same order the page itself reads: the transfer

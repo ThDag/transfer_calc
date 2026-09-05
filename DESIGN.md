@@ -67,7 +67,7 @@ Two neutrals, one accent, spent once.
 - **Concrete Gray** (#999999): secondary text — field label, row captions, placeholder text.
 
 ### Named Rules
-**The One Accent Rule.** As a *standing* mark of ownership, the accent color lives in exactly one place: Our Comm's own label and value text, the owner's own earnings. Everywhere else — including Received Amount and Comm Main, both larger dollar figures — stays black, white, or gray. The one exception is *momentary*: any copy button's brief post-click confirmation also turns Sage, because that's feedback about an action just taken, not a standing claim about a number's importance — it fades in about a second, on whichever button was pressed, not just Our Comm's.
+**The One Accent Rule.** As a *standing* mark of ownership, the accent color lives in exactly one place: Our Comm's own label and value text, the owner's own earnings. Everywhere else — including Received Amount and Comm Main, both larger dollar figures — stays black, white, or gray. The one exception is *momentary*: any copy confirmation also uses Sage (as a border/icon color on a standalone button, or as a background invert on a tappable value), because that's feedback about an action just taken, not a standing claim about a number's importance — it fades in about a second, on whichever element was tapped, not just Our Comm's.
 
 ## Typography
 
@@ -125,11 +125,16 @@ Zero border-radius everywhere — every bordered element (Twin Pair Fields, inpu
 ### Copy Button
 - **Style:** 2px solid Signal White border, Void Black fill, zero radius — same border language as inputs, no separate visual system invented for it
 - **Icon:** a drawn copy glyph (two overlapping squares, one consistent stroke, corners squared to 0px to match the rest of the system) — never an emoji or a font icon
-- **Standalone placement** (Our Comm, Export): stretched to match its row's height, sitting immediately after the value it copies; inside the ledger it shrinks to a compact 26px square
+- **Standalone placement** (Export): stretched to match its row's height, sitting immediately after the value it copies
 - **Twin Pair Field variant:** borderless, transparent, gray-until-hover — sits inside each currency segment itself (USD and AED each get their own), not a shared button for the whole pair; copies that one segment's own value with its own prefix (e.g. Amount's AED face copies "AED 3,672.50" alone, independent of its USD sibling)
 - **Confirmation state:** on copy, the icon swaps to a checkmark and the border/icon (or just the icon color, for the borderless pair variant) turn Sage for about a second, then revert — the only place besides Our Comm's own text that the accent appears, and only for a moment, as a state change rather than a standing mark
 - **What it copies:** the value exactly as displayed, prefix included, always scoped to the one field the button sits beside — never a combined multi-value string
-- **Empty state:** every copy button dims to ~30-35% opacity and drops its hover response when its own field is empty; Our Comm's button has no empty state since it always shows a real amount, even AED 0.00
+- **Empty state:** every copy button dims to ~30-35% opacity and drops its hover response when its own field is empty
+
+### Ledger Value (tap-to-copy, no button)
+- **Style:** Service Comm, Our Comm, and Comm Main have no separate copy button at all — the value itself IS the control, rendered as an unstyled-at-rest `<button>` (no border, no background, `font: inherit`) so it looks exactly like the plain text it replaces until interacted with
+- **Confirmation:** on tap, the value's own background and text invert (Sage background, Void Black text) for about a second, then revert — deliberately **not** just a color change, because Our Comm's text is already Sage at rest; an icon swap or color-only flash would be invisible or redundant there. The invert reads clearly regardless of the row's resting color, so one confirmation mechanism covers all three rows.
+- **Why not a button next to it:** a value that's directly tappable removes a whole extra element per row; the Twin Pair Field's inline mini-copy buttons exist because those rows already have room and a clear boundary (the segment) to anchor a button to — the ledger's plain rows don't, so the value absorbs the action instead.
 
 ### Exchange Rate Field
 - **Style:** the one deliberately quiet control on the page — no full uppercase label above it, a thin-feeling inline sentence ("1 USD = [ ] AED") in 12px Concrete Gray instead of a bordered block with its own row. The input itself still keeps the system's 2px-border floor (just in gray, not white) and the same Sage focus treatment as every other field — quiet is achieved through absence of ceremony (no label, tiny width), never by breaking the border-weight invariant.
